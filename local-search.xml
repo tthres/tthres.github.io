@@ -4,6 +4,89 @@
   
   
   <entry>
+    <title>nginx映射本地路径到url请求</title>
+    <link href="/2022/08/30/2022-8-30-nginx%E6%98%A0%E5%B0%84%E6%9C%AC%E5%9C%B0%E8%B7%AF%E5%BE%84%E5%88%B0url%E8%AF%B7%E6%B1%82/"/>
+    <url>/2022/08/30/2022-8-30-nginx%E6%98%A0%E5%B0%84%E6%9C%AC%E5%9C%B0%E8%B7%AF%E5%BE%84%E5%88%B0url%E8%AF%B7%E6%B1%82/</url>
+    
+    <content type="html"><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>将本地程序生成的图片通过nginx代理，使外部可以通过url访问指定ip:端口&#x2F;路径进行下载。</p><h1 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h1><h2 id="docker"><a href="#docker" class="headerlink" title="docker"></a>docker</h2><p>为了不影响外部其他程序，将nginx放在容器中运行，首先获取nginx的镜像：</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">pull nginx<br></code></pre></td></tr></table></figure><p>启动容器，并将本地存放图片的路径映射到docker里（将项目根目录下的images文件映射到docker里的&#x2F;home&#x2F;www）, 同时进行端口的映射（docker内的80端口映射到外部的8080端口）： </p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">docker run -itd --name nginx-pic -v $PWD/images:/home/www -p 8080:80/tcp nginx <br></code></pre></td></tr></table></figure><p>此时进入容器可以看到&#x2F;home&#x2F;www&#x2F;下存放着需要处理的图片。</p><h2 id="nginx配置"><a href="#nginx配置" class="headerlink" title="nginx配置"></a>nginx配置</h2><p>修改&#x2F;etc&#x2F;nginx&#x2F;conf.d&#x2F;default.conf:</p><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs nginx"><span class="hljs-section">server</span> &#123;<br>    <span class="hljs-attribute">listen</span> <span class="hljs-number">80</span>;<br>    <span class="hljs-section">location</span><span class="hljs-regexp"> ^~/images/</span> &#123;<br>    <span class="hljs-attribute">alias</span> /home/www/;<br>        <span class="hljs-attribute">autoindex</span> <span class="hljs-literal">on</span>;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure><p>alias指定的是绝对路径，此时保存退出，执行命令重载配置：</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">nginx -s reload<br></code></pre></td></tr></table></figure><p>完成后即可通过 ：ip:8080&#x2F;images下载到本地项目路径下images的图片。</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>随笔</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>nginx</tag>
+      
+      <tag>docker</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>cout和printf的笔记</title>
+    <link href="/2022/08/27/2022-8-28-cout%E5%92%8Cprintf%E7%9A%84%E7%AC%94%E8%AE%B0/"/>
+    <url>/2022/08/27/2022-8-28-cout%E5%92%8Cprintf%E7%9A%84%E7%AC%94%E8%AE%B0/</url>
+    
+    <content type="html"><![CDATA[<h1 id="描述"><a href="#描述" class="headerlink" title="描述"></a>描述</h1><p>在打印cv::Mat.data时出现了下面的现象</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> cv;<br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    cv::Mat A = cv::<span class="hljs-built_in">imread</span>(<span class="hljs-string">&quot;../opencv_test.jpg&quot;</span>);<br><span class="hljs-function">cv::Mat <span class="hljs-title">B</span><span class="hljs-params">(A)</span></span>;<br>cv::Mat C = A;<br>    <br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;A.data = %p\nB.data = %p\nC.data = %p\n&quot;</span>, A.data, B.data, C.data);<br>    <br>    <span class="hljs-comment">// cout &lt;&lt; A.data &lt;&lt; endl;</span><br>    <br>    cout &lt;&lt; <span class="hljs-string">&quot;(void*)A.data:  &quot;</span> &lt;&lt; (<span class="hljs-type">void</span>*)A.data &lt;&lt; endl;<br>    cout &lt;&lt; <span class="hljs-string">&quot;(void*)B.data:  &quot;</span> &lt;&lt; (<span class="hljs-type">void</span>*)B.data &lt;&lt; endl;<br>    cout &lt;&lt; <span class="hljs-string">&quot;(void*)C.data:  &quot;</span> &lt;&lt; (<span class="hljs-type">void</span>*)C.data &lt;&lt; endl;<br>    <br>    cout &lt;&lt; <span class="hljs-string">&quot;&amp;A.data:  &quot;</span> &lt;&lt; &amp;A.data &lt;&lt; endl;<br>    cout &lt;&lt; <span class="hljs-string">&quot;&amp;B.data:  &quot;</span> &lt;&lt; &amp;B.data &lt;&lt; endl;<br>    cout &lt;&lt; <span class="hljs-string">&quot;&amp;C.data:  &quot;</span> &lt;&lt; &amp;C.data &lt;&lt; endl;<br>    <br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure><p>输出：</p><figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs haskell"><span class="hljs-type">A</span>.<span class="hljs-class"><span class="hljs-keyword">data</span> = 0x7f3ac2275040</span><br><span class="hljs-type">B</span>.<span class="hljs-class"><span class="hljs-keyword">data</span> = 0x7f3ac2275040</span><br><span class="hljs-type">C</span>.<span class="hljs-class"><span class="hljs-keyword">data</span> = 0x7f3ac2275040</span><br>(void*)<span class="hljs-type">A</span>.<span class="hljs-class"><span class="hljs-keyword">data</span>:  0x7f3ac2275040</span><br>(void*)<span class="hljs-type">B</span>.<span class="hljs-class"><span class="hljs-keyword">data</span>:  0x7f3ac2275040</span><br>(void*)<span class="hljs-type">C</span>.<span class="hljs-class"><span class="hljs-keyword">data</span>:  0x7f3ac2275040</span><br>&amp;<span class="hljs-type">A</span>.<span class="hljs-class"><span class="hljs-keyword">data</span>:  0x7ffee9658480</span><br>&amp;<span class="hljs-type">B</span>.<span class="hljs-class"><span class="hljs-keyword">data</span>:  0x7ffee9658420</span><br>&amp;<span class="hljs-type">C</span>.<span class="hljs-class"><span class="hljs-keyword">data</span>:  0x7ffee96583c0</span><br></code></pre></td></tr></table></figure><br/><p>如果这样写，会输出一大段乱码：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++">cout &lt;&lt; A.data &lt;&lt; endl;<br></code></pre></td></tr></table></figure><h1 id="解释"><a href="#解释" class="headerlink" title="解释"></a>解释</h1><p>Mat::data是数据段的首地址，在C语言中，是靠%s,%x,%p来区分指针表达式的，所以就会直接打印出正确的data首地址出来；C++标准库中I&#x2F;O类对输出操作符&lt;&lt;重载，在遇到指针，例如字符型指针时会将其当做字符串名来处理，输出指针所指的字符串。例如：  </p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-type">char</span> ss[<span class="hljs-number">20</span>]=<span class="hljs-string">&quot;hello&quot;</span>;<br>cout&lt;&lt;ss&lt;&lt;endl;<br>cout&lt;&lt;&amp;ss[<span class="hljs-number">0</span>]&lt;&lt;endl;<br></code></pre></td></tr></table></figure><p>输出：</p><figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs ebnf"><span class="hljs-attribute">hello</span><br><span class="hljs-attribute">hello</span><br></code></pre></td></tr></table></figure><p>这也说明用 “cout &lt;&lt; A.data &lt;&lt; endl;” 会输出一大串乱码； 我们只需要将char*类型的指针强制转换为其他类型的指针，cout就会输出指针存储的位置。上面的Mat.data也同理。Mat::data的默认类型为uchar *。<br>至于 “cout &lt;&lt; “&amp;A.data:  “ &lt;&lt; &amp;A.data &lt;&lt; endl;” 输出的地址有所不同，是因为取了指针的地址，三个对象的指针的地址是不同的。</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>随笔</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>C/C++</tag>
+      
+      <tag>opencv</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>图像质量诊断:雪花,模糊度评估</title>
+    <link href="/2022/08/27/2022-8-27-%E5%9B%BE%E5%83%8F%E8%B4%A8%E9%87%8F%E8%AF%8A%E6%96%AD-%E9%9B%AA%E8%8A%B1-%E6%A8%A1%E7%B3%8A%E5%BA%A6%E8%AF%84%E4%BC%B0/"/>
+    <url>/2022/08/27/2022-8-27-%E5%9B%BE%E5%83%8F%E8%B4%A8%E9%87%8F%E8%AF%8A%E6%96%AD-%E9%9B%AA%E8%8A%B1-%E6%A8%A1%E7%B3%8A%E5%BA%A6%E8%AF%84%E4%BC%B0/</url>
+    
+    <content type="html"><![CDATA[<h1 id="opencv"><a href="#opencv" class="headerlink" title="opencv"></a>opencv</h1><h2 id="cv-Mat"><a href="#cv-Mat" class="headerlink" title="cv::Mat"></a>cv::Mat</h2><p>opencv的Mat类，使得opencv的编程更加的简单,我们能得到如下好处:<br>1、不需要手动申请一块内存；<br>2、不需要手动释放内存；<br>3、通过类的封装能方便获取类的数据；  <br/><br>显然的，它利用了类的特性，将内存管理和数据信息封装在类的内部，用户只需要对Mat类对象进行数据或面向对象操作即可。<br>Mat类分为两个部分：矩阵头和矩阵数据。如果我们在操作一副图像的数据量时，矩阵数据的大小很大（一般约有1M的数据量），那么拷贝和赋值函数所作的操作如果的深拷贝的话，效率会大大的降低。所以，Opencv的做法是只复制其矩阵头信息，而矩阵数据采用引用的方式，即多个Mat对象共享同一个矩阵数据，这里使用的原理类似c++11中的共享指针。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c++">cv::Mat A = cv::<span class="hljs-built_in">imread</span>(<span class="hljs-string">&quot;../opencv_test.jpg&quot;</span>);<br><span class="hljs-function">cv::Mat <span class="hljs-title">B</span><span class="hljs-params">(A)</span></span>;<br>cv::Mat C = A;<br><br><span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;A.data = %p\nB.data = %p\nC.data = %p\n&quot;</span>, A.data, B.data, C.data);<br></code></pre></td></tr></table></figure><p>输出：</p><figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs haskell"><span class="hljs-type">A</span>.<span class="hljs-class"><span class="hljs-keyword">data</span> = 0x7f2c1fac5040</span><br><span class="hljs-type">B</span>.<span class="hljs-class"><span class="hljs-keyword">data</span> = 0x7f2c1fac5040</span><br><span class="hljs-type">C</span>.<span class="hljs-class"><span class="hljs-keyword">data</span> = 0x7f2c1fac5040</span><br></code></pre></td></tr></table></figure><p>三个Mat类对象的矩阵数据的地址是一样的。</p><h2 id="cv-cvtColor"><a href="#cv-cvtColor" class="headerlink" title="cv::cvtColor()"></a>cv::cvtColor()</h2><p>用于将图像从一个颜色空间转换到另一个颜色空间的转换。</p><h2 id="cv-blur"><a href="#cv-blur" class="headerlink" title="cv::blur()"></a>cv::blur()</h2><p>对输入的图像src进行均值滤波后用dst输出。</p><h3 id="均值滤波"><a href="#均值滤波" class="headerlink" title="均值滤波"></a>均值滤波</h3><h1 id="雪花噪声评估"><a href="#雪花噪声评估" class="headerlink" title="雪花噪声评估"></a>雪花噪声评估</h1><h1 id="模糊度评估"><a href="#模糊度评估" class="headerlink" title="模糊度评估"></a>模糊度评估</h1>]]></content>
+    
+    
+    <categories>
+      
+      <category>随笔</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>c++</tag>
+      
+      <tag>视频质量诊断</tag>
+      
+      <tag>opencv</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>01背包 递归→记忆化搜索→动态规划</title>
     <link href="/2022/08/13/2022-8-13-01%E8%83%8C%E5%8C%85%E9%97%AE%E9%A2%98/"/>
     <url>/2022/08/13/2022-8-13-01%E8%83%8C%E5%8C%85%E9%97%AE%E9%A2%98/</url>
@@ -13,7 +96,7 @@
     
     <categories>
       
-      <category>学习</category>
+      <category>随笔</category>
       
     </categories>
     
@@ -38,7 +121,7 @@
     
     <categories>
       
-      <category>学习</category>
+      <category>随笔</category>
       
     </categories>
     
@@ -63,7 +146,7 @@
     
     <categories>
       
-      <category>学习</category>
+      <category>随笔</category>
       
     </categories>
     
@@ -88,7 +171,7 @@
     
     <categories>
       
-      <category>学习</category>
+      <category>随笔</category>
       
     </categories>
     
@@ -113,7 +196,7 @@
     
     <categories>
       
-      <category>学习</category>
+      <category>随笔</category>
       
     </categories>
     
@@ -138,7 +221,7 @@
     
     <categories>
       
-      <category>学习</category>
+      <category>随笔</category>
       
     </categories>
     
@@ -163,7 +246,7 @@
     
     <categories>
       
-      <category>学习</category>
+      <category>随笔</category>
       
     </categories>
     
@@ -188,7 +271,7 @@
     
     <categories>
       
-      <category>学习</category>
+      <category>随笔</category>
       
     </categories>
     
@@ -213,7 +296,7 @@
     
     <categories>
       
-      <category>学习</category>
+      <category>随笔</category>
       
     </categories>
     
@@ -238,7 +321,7 @@
     
     <categories>
       
-      <category>学习</category>
+      <category>随笔</category>
       
     </categories>
     
@@ -263,7 +346,7 @@
     
     <categories>
       
-      <category>学习</category>
+      <category>随笔</category>
       
     </categories>
     
@@ -288,7 +371,7 @@
     
     <categories>
       
-      <category>学习</category>
+      <category>随笔</category>
       
     </categories>
     
@@ -313,7 +396,7 @@
     
     <categories>
       
-      <category>学习</category>
+      <category>随笔</category>
       
     </categories>
     

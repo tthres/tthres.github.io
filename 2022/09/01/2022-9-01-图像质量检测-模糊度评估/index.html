@@ -16,25 +16,28 @@
   <meta name="author" content="水果挺甜">
   <meta name="keywords" content="">
   
-    <meta name="description" content="前言将本地程序生成的图片通过nginx代理，使外部可以通过url访问指定ip:端口&#x2F;路径进行下载。 解决方法docker为了不影响外部其他程序，将nginx放在容器中运行，首先获取nginx的镜像： 1pull nginx 启动容器，并将本地存放图片的路径映射到docker里（将项目根目录下的images文件映射到docker里的&#x2F;home&#x2F;www）, 同时进行端口的">
+    <meta name="description" content="图像模糊度检测无参考图像的图像模糊度评估 拉普拉斯拉普拉斯算子拉普拉斯算子是图像邻域内像素灰度差分计算的基础，通过二阶微分推导出的一种图像邻域增强算法。它的基本思想是当邻域的中心像素灰度低于它所在邻域内的其他像素的平均灰度时，此中心像素的灰度应该进一步降低；当高于时进一步提高中心像素的灰度，从而实现图像锐化处理。   Laplacian 方法能够进行模糊检测工作的原因是 Laplacian 算子是">
 <meta property="og:type" content="article">
-<meta property="og:title" content="nginx映射本地路径到url请求">
-<meta property="og:url" content="https://tthres.github.io/2022/08/30/2022-8-30-nginx%E6%98%A0%E5%B0%84%E6%9C%AC%E5%9C%B0%E8%B7%AF%E5%BE%84%E5%88%B0url%E8%AF%B7%E6%B1%82/index.html">
+<meta property="og:title" content="图像质量检测:模糊度评估">
+<meta property="og:url" content="https://tthres.github.io/2022/09/01/2022-9-01-%E5%9B%BE%E5%83%8F%E8%B4%A8%E9%87%8F%E6%A3%80%E6%B5%8B-%E6%A8%A1%E7%B3%8A%E5%BA%A6%E8%AF%84%E4%BC%B0/index.html">
 <meta property="og:site_name" content="水果挺甜&#39;blog">
-<meta property="og:description" content="前言将本地程序生成的图片通过nginx代理，使外部可以通过url访问指定ip:端口&#x2F;路径进行下载。 解决方法docker为了不影响外部其他程序，将nginx放在容器中运行，首先获取nginx的镜像： 1pull nginx 启动容器，并将本地存放图片的路径映射到docker里（将项目根目录下的images文件映射到docker里的&#x2F;home&#x2F;www）, 同时进行端口的">
+<meta property="og:description" content="图像模糊度检测无参考图像的图像模糊度评估 拉普拉斯拉普拉斯算子拉普拉斯算子是图像邻域内像素灰度差分计算的基础，通过二阶微分推导出的一种图像邻域增强算法。它的基本思想是当邻域的中心像素灰度低于它所在邻域内的其他像素的平均灰度时，此中心像素的灰度应该进一步降低；当高于时进一步提高中心像素的灰度，从而实现图像锐化处理。   Laplacian 方法能够进行模糊检测工作的原因是 Laplacian 算子是">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://tthres.github.io/img/2022-8-13-01%E8%83%8C%E5%8C%85/2022-8-30-nginx%E6%98%A0%E5%B0%84%E6%9C%AC%E5%9C%B0%E8%B7%AF%E5%BE%84%E5%B0%81%E9%9D%A2.png">
-<meta property="article:published_time" content="2022-08-30T02:40:01.000Z">
-<meta property="article:modified_time" content="2022-08-30T03:10:37.294Z">
+<meta property="og:image" content="https://tthres.github.io/img/2022-8-27%E8%A7%86%E9%A2%91%E8%AF%8A%E6%96%AD/cat05.jpg">
+<meta property="og:image" content="https://tthres.github.io/img/2022-8-27%E8%A7%86%E9%A2%91%E8%AF%8A%E6%96%AD/blur_flower02.jpg">
+<meta property="og:image" content="https://tthres.github.io/img/2022-8-27%E8%A7%86%E9%A2%91%E8%AF%8A%E6%96%AD/blur_flower01.jpg">
+<meta property="article:published_time" content="2022-09-01T02:40:33.000Z">
+<meta property="article:modified_time" content="2022-09-04T07:22:03.732Z">
 <meta property="article:author" content="水果挺甜">
-<meta property="article:tag" content="nginx">
-<meta property="article:tag" content="docker">
+<meta property="article:tag" content="c++">
+<meta property="article:tag" content="视频质量诊断">
+<meta property="article:tag" content="opencv">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://tthres.github.io/img/2022-8-13-01%E8%83%8C%E5%8C%85/2022-8-30-nginx%E6%98%A0%E5%B0%84%E6%9C%AC%E5%9C%B0%E8%B7%AF%E5%BE%84%E5%B0%81%E9%9D%A2.png">
+<meta name="twitter:image" content="https://tthres.github.io/img/2022-8-27%E8%A7%86%E9%A2%91%E8%AF%8A%E6%96%AD/cat05.jpg">
   
   
   
-  <title>nginx映射本地路径到url请求 - 水果挺甜&#39;blog</title>
+  <title>图像质量检测:模糊度评估 - 水果挺甜&#39;blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -199,7 +202,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="nginx映射本地路径到url请求"></span>
+            <span id="subtitle" data-typed-text="图像质量检测:模糊度评估"></span>
           
         </div>
 
@@ -210,8 +213,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2022-08-30 10:40" pubdate>
-          2022年8月30日 上午
+        <time datetime="2022-09-01 10:40" pubdate>
+          2022年9月1日 上午
         </time>
       </span>
     
@@ -222,7 +225,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          584 字
+          1.5k 字
         
       </span>
     
@@ -233,7 +236,7 @@
         
         
         
-          5 分钟
+          13 分钟
         
       </span>
     
@@ -271,22 +274,27 @@
         <div id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">nginx映射本地路径到url请求</h1>
+            <h1 style="display: none">图像质量检测:模糊度评估</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>将本地程序生成的图片通过nginx代理，使外部可以通过url访问指定ip:端口&#x2F;路径进行下载。</p>
-<h1 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h1><h2 id="docker"><a href="#docker" class="headerlink" title="docker"></a>docker</h2><p>为了不影响外部其他程序，将nginx放在容器中运行，首先获取nginx的镜像：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">pull nginx<br></code></pre></td></tr></table></figure>
-<p>启动容器，并将本地存放图片的路径映射到docker里（将项目根目录下的images文件映射到docker里的&#x2F;home&#x2F;www）, 同时进行端口的映射（docker内的80端口映射到外部的8080端口）： </p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">docker run -itd --name nginx-pic -v $PWD/images:/home/www -p 8080:80/tcp nginx <br></code></pre></td></tr></table></figure>
-<p>此时进入容器可以看到&#x2F;home&#x2F;www&#x2F;下存放着需要处理的图片。</p>
-<h2 id="nginx配置"><a href="#nginx配置" class="headerlink" title="nginx配置"></a>nginx配置</h2><p>修改&#x2F;etc&#x2F;nginx&#x2F;conf.d&#x2F;default.conf:</p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs nginx"><span class="hljs-section">server</span> &#123;<br>    <span class="hljs-attribute">listen</span> <span class="hljs-number">80</span>;<br>    <span class="hljs-section">location</span><span class="hljs-regexp"> ^~/images/</span> &#123;<br>	    <span class="hljs-attribute">alias</span> /home/www/;<br>        <span class="hljs-attribute">autoindex</span> <span class="hljs-literal">on</span>;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
-<p>alias指定的是绝对路径，此时保存退出，执行命令重载配置：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">nginx -s reload<br></code></pre></td></tr></table></figure>
-<p>完成后即可通过 ：ip:8080&#x2F;images下载到本地项目路径下images的图片。</p>
+                <h1 id="图像模糊度检测"><a href="#图像模糊度检测" class="headerlink" title="图像模糊度检测"></a>图像模糊度检测</h1><p>无参考图像的图像模糊度评估</p>
+<h2 id="拉普拉斯"><a href="#拉普拉斯" class="headerlink" title="拉普拉斯"></a>拉普拉斯</h2><h3 id="拉普拉斯算子"><a href="#拉普拉斯算子" class="headerlink" title="拉普拉斯算子"></a>拉普拉斯算子</h3><p>拉普拉斯算子是图像邻域内像素灰度差分计算的基础，通过二阶微分推导出的一种图像邻域增强算法。它的基本思想是当邻域的中心像素灰度低于它所在邻域内的其他像素的平均灰度时，此中心像素的灰度应该进一步降低；当高于时进一步提高中心像素的灰度，从而实现图像锐化处理。  </p>
+<p>Laplacian 方法能够进行模糊检测工作的原因是 Laplacian 算子是用来衡量图片的二阶导，能够强调图片中密度快速变化的区域，也就是边界，故常用于边界检测。在正常图片中边界比较清晰因此方差会比较大；而在模糊图片中包含的边界信息很少，所以方差会较小。  </p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">Laplacian</span><span class="hljs-params">(InputArray src, </span></span><br><span class="hljs-params"><span class="hljs-function">                outputArray dst, </span></span><br><span class="hljs-params"><span class="hljs-function">                <span class="hljs-type">int</span> ddepth,                     <span class="hljs-comment">// 目标图像的深度</span></span></span><br><span class="hljs-params"><span class="hljs-function">                <span class="hljs-type">int</span> ksize=<span class="hljs-number">1</span>,                    <span class="hljs-comment">// 计算二阶导数的滤波器的核的大小</span></span></span><br><span class="hljs-params"><span class="hljs-function">                <span class="hljs-type">double</span> scale=<span class="hljs-number">1</span>,                 <span class="hljs-comment">// 比例因子</span></span></span><br><span class="hljs-params"><span class="hljs-function">                doubel delta=<span class="hljs-number">0</span>, </span></span><br><span class="hljs-params"><span class="hljs-function">                <span class="hljs-type">int</span> borderType=BORDER_DEFAULT)</span></span><br></code></pre></td></tr></table></figure>
+<br/>
+
+<p>例子：<br>laplacion对噪声的敏感度较大，一般会加上GaussianBulr先处理。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs c++">cv::Mat lena = cv::<span class="hljs-built_in">imread</span>(<span class="hljs-string">&quot;xxx.jpg&quot;</span>, <span class="hljs-number">1</span>);<br><br>cv::Mat result_1;<br>cv::Mat result_2；<br><br>cv::<span class="hljs-built_in">GaussianBlur</span>(lena, blured, cv::<span class="hljs-built_in">Size</span>(<span class="hljs-number">5</span>, <span class="hljs-number">5</span>), <span class="hljs-number">0</span>, <span class="hljs-number">0</span>);<br>cv::<span class="hljs-built_in">Laplacian</span>(lena, result_1, CV_32F);<br>cv::<span class="hljs-built_in">Laplacian</span>(blured, result_2, CV_32F);<br><br>cv::<span class="hljs-built_in">imshow</span>(<span class="hljs-string">&quot;lena&quot;</span>, lena);<br>cv::<span class="hljs-built_in">imshow</span>(<span class="hljs-string">&quot;result_1 CV_32F&quot;</span>, result_1);<br>cv::<span class="hljs-built_in">imshow</span>(<span class="hljs-string">&quot;result_2 CV_32F + Gaussian&quot;</span>, result_2);<br></code></pre></td></tr></table></figure>
+<p><img src="/img/2022-8-27%E8%A7%86%E9%A2%91%E8%AF%8A%E6%96%AD/cat05.jpg" srcset="/img/loading.gif" lazyload alt="拉普拉斯"></p>
+<h3 id="meanStdDev"><a href="#meanStdDev" class="headerlink" title="meanStdDev()"></a>meanStdDev()</h3><p>该函数可以表示一个图像的明暗变化程度，标准差越大，明暗变化越明显。<br>均值反映了图像的亮度，均值越大说明图像亮度越大，反之越小；<br>标准差反映了图像像素值与均值的离散程度，标准差越大说明图像的质量越好；<br>平均梯度反映了图像的清晰度和纹理变化，平均梯度越大说明图像越清晰；</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">meanStdDev</span><span class="hljs-params">(InputArray src, </span></span><br><span class="hljs-params"><span class="hljs-function">                OutputArray mean,               <span class="hljs-comment">// 输出参数，计算出的平均值</span></span></span><br><span class="hljs-params"><span class="hljs-function">                OutputArray stddev,             <span class="hljs-comment">// 输出参数，计算出的标准差</span></span></span><br><span class="hljs-params"><span class="hljs-function">                InputArray mask=noArray())</span></span>;<br></code></pre></td></tr></table></figure>
+
+<h2 id="评估方法"><a href="#评估方法" class="headerlink" title="评估方法"></a>评估方法</h2><p>拉普拉斯算子做卷积运算，再根据方差来评估，输出即为模糊度；normal_std和normal_mean为事先设定的阈值，分别是标准差系数和模糊度均值。</p>
+<h2 id="部分代码"><a href="#部分代码" class="headerlink" title="部分代码"></a>部分代码</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-type">float</span> normal_std = <span class="hljs-number">0.5f</span>;<br><span class="hljs-type">float</span> normal_mean = <span class="hljs-number">10.0f</span>;<br><br>cv::Mat gray, lap;<br>cv::<span class="hljs-built_in">cvtColor</span>(image, gray, cv::COLOR_BGR2GRAY);<br><br>cv::<span class="hljs-built_in">Laplacian</span>(gray, lap, CV_8UC1);<br><br>cv::Scalar mean, std;      <span class="hljs-comment">// 颜色</span><br><br>cv::<span class="hljs-built_in">meanStdDev</span>(lap, mean, std); <span class="hljs-comment">// mean：平均值, std:标准差</span><br><br><span class="hljs-keyword">return</span> <span class="hljs-built_in">float</span>(<span class="hljs-number">1.0</span> / (<span class="hljs-number">1.0</span> + cv::<span class="hljs-built_in">exp</span>((std[<span class="hljs-number">0</span>] - normal_mean) * normal_std)));<br></code></pre></td></tr></table></figure>
+
+<p><img src="/img/2022-8-27%E8%A7%86%E9%A2%91%E8%AF%8A%E6%96%AD/blur_flower02.jpg" srcset="/img/loading.gif" lazyload alt="模糊度:0.003713"><br><img src="/img/2022-8-27%E8%A7%86%E9%A2%91%E8%AF%8A%E6%96%AD/blur_flower01.jpg" srcset="/img/loading.gif" lazyload alt="模糊度:0.649901"></p>
 
                 
               </div>
@@ -320,9 +328,11 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/nginx/">#nginx</a>
+        <a href="/tags/c/">#c++</a>
       
-        <a href="/tags/docker/">#docker</a>
+        <a href="/tags/%E8%A7%86%E9%A2%91%E8%B4%A8%E9%87%8F%E8%AF%8A%E6%96%AD/">#视频质量诊断</a>
+      
+        <a href="/tags/opencv/">#opencv</a>
       
     </div>
   
@@ -334,8 +344,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>nginx映射本地路径到url请求</div>
-      <div>https://tthres.github.io/2022/08/30/2022-8-30-nginx映射本地路径到url请求/</div>
+      <div>图像质量检测:模糊度评估</div>
+      <div>https://tthres.github.io/2022/09/01/2022-9-01-图像质量检测-模糊度评估/</div>
     </div>
     <div class="license-meta">
       
@@ -347,7 +357,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2022年8月30日</div>
+          <div>2022年9月1日</div>
         </div>
       
       
@@ -377,9 +387,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2022/09/01/2022-9-01-%E5%9B%BE%E5%83%8F%E8%B4%A8%E9%87%8F%E6%A3%80%E6%B5%8B-%E6%A8%A1%E7%B3%8A%E5%BA%A6%E8%AF%84%E4%BC%B0/" title="图像质量检测:模糊度评估">
+                      <a href="/2022/09/04/2022-9-4-%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88/" title="智能指针">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">图像质量检测:模糊度评估</span>
+                        <span class="hidden-mobile">智能指针</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -387,8 +397,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2022/08/27/2022-8-28-cout%E5%92%8Cprintf%E7%9A%84%E7%AC%94%E8%AE%B0/" title="cout和printf的笔记">
-                        <span class="hidden-mobile">cout和printf的笔记</span>
+                      <a href="/2022/08/30/2022-8-30-nginx%E6%98%A0%E5%B0%84%E6%9C%AC%E5%9C%B0%E8%B7%AF%E5%BE%84%E5%88%B0url%E8%AF%B7%E6%B1%82/" title="nginx映射本地路径到url请求">
+                        <span class="hidden-mobile">nginx映射本地路径到url请求</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

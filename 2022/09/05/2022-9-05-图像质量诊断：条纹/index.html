@@ -16,23 +16,24 @@
   <meta name="author" content="水果挺甜">
   <meta name="keywords" content="">
   
-    <meta name="description" content="描述在打印cv::Mat.data时出现了下面的现象 1234567891011121314151617181920212223using namespace cv;using namespace std;int main()&amp;#123;    cv::Mat A &#x3D; cv::imread(&quot;..&#x2F;opencv_test.jpg&quot;);	cv::Mat B(A);	cv::Mat">
+    <meta name="description" content="条纹噪声检测cv::threshold()12345double cv::threshold(InputArray src,                     OutputArray dst,                     double thres,       &#x2F;&#x2F; 阈值                    double maxval,      &#x2F;&#x2F; 二值图像中灰度最大值">
 <meta property="og:type" content="article">
-<meta property="og:title" content="cout和printf的笔记">
-<meta property="og:url" content="https://tthres.github.io/2022/08/27/2022-8-28-cout%E5%92%8Cprintf%E7%9A%84%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:title" content="图像质量诊断：条纹">
+<meta property="og:url" content="https://tthres.github.io/2022/09/05/2022-9-05-%E5%9B%BE%E5%83%8F%E8%B4%A8%E9%87%8F%E8%AF%8A%E6%96%AD%EF%BC%9A%E6%9D%A1%E7%BA%B9/index.html">
 <meta property="og:site_name" content="水果挺甜&#39;blog">
-<meta property="og:description" content="描述在打印cv::Mat.data时出现了下面的现象 1234567891011121314151617181920212223using namespace cv;using namespace std;int main()&amp;#123;    cv::Mat A &#x3D; cv::imread(&quot;..&#x2F;opencv_test.jpg&quot;);	cv::Mat B(A);	cv::Mat">
+<meta property="og:description" content="条纹噪声检测cv::threshold()12345double cv::threshold(InputArray src,                     OutputArray dst,                     double thres,       &#x2F;&#x2F; 阈值                    double maxval,      &#x2F;&#x2F; 二值图像中灰度最大值">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2022-08-27T15:59:40.000Z">
-<meta property="article:modified_time" content="2022-08-27T16:31:39.554Z">
+<meta property="article:published_time" content="2022-09-05T01:01:33.000Z">
+<meta property="article:modified_time" content="2022-09-11T17:53:12.023Z">
 <meta property="article:author" content="水果挺甜">
-<meta property="article:tag" content="C&#x2F;C++">
+<meta property="article:tag" content="c++">
+<meta property="article:tag" content="视频质量诊断">
 <meta property="article:tag" content="opencv">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>cout和printf的笔记 - 水果挺甜&#39;blog</title>
+  <title>图像质量诊断：条纹 - 水果挺甜&#39;blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -197,7 +198,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="cout和printf的笔记"></span>
+            <span id="subtitle" data-typed-text="图像质量诊断：条纹"></span>
           
         </div>
 
@@ -208,8 +209,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2022-08-27 23:59" pubdate>
-          2022年8月27日 晚上
+        <time datetime="2022-09-05 09:01" pubdate>
+          2022年9月5日 上午
         </time>
       </span>
     
@@ -220,7 +221,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.5k 字
+          167 字
         
       </span>
     
@@ -231,7 +232,7 @@
         
         
         
-          13 分钟
+          2 分钟
         
       </span>
     
@@ -269,26 +270,13 @@
         <div id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">cout和printf的笔记</h1>
+            <h1 style="display: none">图像质量诊断：条纹</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="描述"><a href="#描述" class="headerlink" title="描述"></a>描述</h1><p>在打印cv::Mat.data时出现了下面的现象</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> cv;<br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    cv::Mat A = cv::<span class="hljs-built_in">imread</span>(<span class="hljs-string">&quot;../opencv_test.jpg&quot;</span>);<br>	<span class="hljs-function">cv::Mat <span class="hljs-title">B</span><span class="hljs-params">(A)</span></span>;<br>	cv::Mat C = A;<br>    <br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;A.data = %p\nB.data = %p\nC.data = %p\n&quot;</span>, A.data, B.data, C.data);<br>    <br>    <span class="hljs-comment">// cout &lt;&lt; A.data &lt;&lt; endl;</span><br>    <br>    cout &lt;&lt; <span class="hljs-string">&quot;(void*)A.data:  &quot;</span> &lt;&lt; (<span class="hljs-type">void</span>*)A.data &lt;&lt; endl;<br>    cout &lt;&lt; <span class="hljs-string">&quot;(void*)B.data:  &quot;</span> &lt;&lt; (<span class="hljs-type">void</span>*)B.data &lt;&lt; endl;<br>    cout &lt;&lt; <span class="hljs-string">&quot;(void*)C.data:  &quot;</span> &lt;&lt; (<span class="hljs-type">void</span>*)C.data &lt;&lt; endl;<br>    <br>    cout &lt;&lt; <span class="hljs-string">&quot;&amp;A.data:  &quot;</span> &lt;&lt; &amp;A.data &lt;&lt; endl;<br>    cout &lt;&lt; <span class="hljs-string">&quot;&amp;B.data:  &quot;</span> &lt;&lt; &amp;B.data &lt;&lt; endl;<br>    cout &lt;&lt; <span class="hljs-string">&quot;&amp;C.data:  &quot;</span> &lt;&lt; &amp;C.data &lt;&lt; endl;<br>    <br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
-<p>输出：</p>
-<figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs haskell"><span class="hljs-type">A</span>.<span class="hljs-class"><span class="hljs-keyword">data</span> = 0x7f3ac2275040</span><br><span class="hljs-type">B</span>.<span class="hljs-class"><span class="hljs-keyword">data</span> = 0x7f3ac2275040</span><br><span class="hljs-type">C</span>.<span class="hljs-class"><span class="hljs-keyword">data</span> = 0x7f3ac2275040</span><br>(void*)<span class="hljs-type">A</span>.<span class="hljs-class"><span class="hljs-keyword">data</span>:  0x7f3ac2275040</span><br>(void*)<span class="hljs-type">B</span>.<span class="hljs-class"><span class="hljs-keyword">data</span>:  0x7f3ac2275040</span><br>(void*)<span class="hljs-type">C</span>.<span class="hljs-class"><span class="hljs-keyword">data</span>:  0x7f3ac2275040</span><br>&amp;<span class="hljs-type">A</span>.<span class="hljs-class"><span class="hljs-keyword">data</span>:  0x7ffee9658480</span><br>&amp;<span class="hljs-type">B</span>.<span class="hljs-class"><span class="hljs-keyword">data</span>:  0x7ffee9658420</span><br>&amp;<span class="hljs-type">C</span>.<span class="hljs-class"><span class="hljs-keyword">data</span>:  0x7ffee96583c0</span><br></code></pre></td></tr></table></figure>
-<br/>
-
-<p>如果这样写，会输出一大段乱码：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++">cout &lt;&lt; A.data &lt;&lt; endl;<br></code></pre></td></tr></table></figure>
-
-
-<h1 id="解释"><a href="#解释" class="headerlink" title="解释"></a>解释</h1><p>Mat::data是数据段的首地址，在C语言中，是靠%s,%x,%p来区分指针表达式的，所以就会直接打印出正确的data首地址出来；C++标准库中I&#x2F;O类对输出操作符&lt;&lt;重载，在遇到指针，例如字符型指针时会将其当做字符串名来处理，输出指针所指的字符串。例如：  </p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-type">char</span> ss[<span class="hljs-number">20</span>]=<span class="hljs-string">&quot;hello&quot;</span>;<br>cout&lt;&lt;ss&lt;&lt;endl;<br>cout&lt;&lt;&amp;ss[<span class="hljs-number">0</span>]&lt;&lt;endl;<br></code></pre></td></tr></table></figure>
-<p>输出：</p>
-<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs ebnf"><span class="hljs-attribute">hello</span><br><span class="hljs-attribute">hello</span><br></code></pre></td></tr></table></figure>
-<p>这也说明用 “cout &lt;&lt; A.data &lt;&lt; endl;” 会输出一大串乱码； 我们只需要将char*类型的指针强制转换为其他类型的指针，cout就会输出指针存储的位置。上面的Mat.data也同理。Mat::data的默认类型为uchar *。<br>至于 “cout &lt;&lt; “&amp;A.data:  “ &lt;&lt; &amp;A.data &lt;&lt; endl;” 输出的地址有所不同，是因为取了指针的地址，三个对象的指针的地址是不同的。</p>
+                <h1 id="条纹噪声检测"><a href="#条纹噪声检测" class="headerlink" title="条纹噪声检测"></a>条纹噪声检测</h1><h2 id="cv-threshold"><a href="#cv-threshold" class="headerlink" title="cv::threshold()"></a>cv::threshold()</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-type">double</span> <span class="hljs-title">cv::threshold</span><span class="hljs-params">(InputArray src, </span></span><br><span class="hljs-params"><span class="hljs-function">                    OutputArray dst, </span></span><br><span class="hljs-params"><span class="hljs-function">                    <span class="hljs-type">double</span> thres,       <span class="hljs-comment">// 阈值</span></span></span><br><span class="hljs-params"><span class="hljs-function">                    <span class="hljs-type">double</span> maxval,      <span class="hljs-comment">// 二值图像中灰度最大值</span></span></span><br><span class="hljs-params"><span class="hljs-function">                    <span class="hljs-type">int</span> type)</span></span>;          <span class="hljs-comment">// 阈值操作类型</span><br></code></pre></td></tr></table></figure>
+<p>图像的阈值操作,可以使图像中数据量大为减少，从而能凸显出目标的轮廓。</p>
 
                 
               </div>
@@ -322,7 +310,9 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/C-C/">#C/C++</a>
+        <a href="/tags/c/">#c++</a>
+      
+        <a href="/tags/%E8%A7%86%E9%A2%91%E8%B4%A8%E9%87%8F%E8%AF%8A%E6%96%AD/">#视频质量诊断</a>
       
         <a href="/tags/opencv/">#opencv</a>
       
@@ -336,8 +326,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>cout和printf的笔记</div>
-      <div>https://tthres.github.io/2022/08/27/2022-8-28-cout和printf的笔记/</div>
+      <div>图像质量诊断：条纹</div>
+      <div>https://tthres.github.io/2022/09/05/2022-9-05-图像质量诊断：条纹/</div>
     </div>
     <div class="license-meta">
       
@@ -349,7 +339,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2022年8月27日</div>
+          <div>2022年9月5日</div>
         </div>
       
       
@@ -374,29 +364,6 @@
 
 
 
-              
-                <div class="post-prevnext my-3">
-                  <article class="post-prev col-6">
-                    
-                    
-                      <a href="/2022/08/30/2022-8-30-nginx%E6%98%A0%E5%B0%84%E6%9C%AC%E5%9C%B0%E8%B7%AF%E5%BE%84%E5%88%B0url%E8%AF%B7%E6%B1%82/" title="nginx映射本地路径到url请求">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">nginx映射本地路径到url请求</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
-                  </article>
-                  <article class="post-next col-6">
-                    
-                    
-                      <a href="/2022/08/27/2022-8-27-%E5%9B%BE%E5%83%8F%E8%B4%A8%E9%87%8F%E8%AF%8A%E6%96%AD-%E9%9B%AA%E8%8A%B1-%E6%A8%A1%E7%B3%8A%E5%BA%A6%E8%AF%84%E4%BC%B0/" title="图像质量诊断：雪花噪声">
-                        <span class="hidden-mobile">图像质量诊断：雪花噪声</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
-                    
-                  </article>
-                </div>
               
             </div>
 

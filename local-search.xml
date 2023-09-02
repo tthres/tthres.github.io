@@ -4,6 +4,31 @@
   
   
   <entry>
+    <title>cmake指定编译器版本问题解决</title>
+    <link href="/2023/09/02/2023-9-2-cmake%E6%8C%87%E5%AE%9A%E7%BC%96%E8%AF%91%E5%99%A8%E7%89%88%E6%9C%AC%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/"/>
+    <url>/2023/09/02/2023-9-2-cmake%E6%8C%87%E5%AE%9A%E7%BC%96%E8%AF%91%E5%99%A8%E7%89%88%E6%9C%AC%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/</url>
+    
+    <content type="html"><![CDATA[<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>在Windows中有一些库由于历史原因需要使用Visual Studio 14 2015才能与程序链接编译成功，所以在cmake构建是执行如下命令：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">&gt;cmake .. -G <span class="hljs-string">&quot;Visual Studio 14 2015&quot;</span> -A win32<br></code></pre></td></tr></table></figure><p>在此之前已经在visual studio installer（2022）中下载了各个版本的C++工具集和相关组件。但还是出现问题：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs bash">-- Selecting Windows SDK version  to target Windows 10.0.22621.<br>CMake Error at CMakeLists.txt:3 (project):<br>  Failed to run MSBuild <span class="hljs-built_in">command</span>:<br><br>    C:/Program Files (x86)/MSBuild/14.0/bin/MSBuild.exe<br><br>  to get the value of VCTargetsPath:<br><br>    Microsoft (R) 生成引擎版本 14.0.23107.0<br>    版权所有(C) Microsoft Corporation。保留所有权利。<br><br>    生成启动时间为 2023/8/31 9:06:39。<br>    节点 1 上的项目“E:XXX\build\CMakeFiles\3.27.0\VCTargetsPath.vcxproj”(默认 目标)。<br>    E:XXX\build\CMakeFiles\3.27.0\VCTargetsPath.vcxproj(14,2): error MSB4019: 未找到导入的项目“E:\Microsoft.Cpp.Default.props”。请确认 &lt;Import&gt; 声明中的路径正确，且磁盘上存在该文件。<br>    已完成生成项目“E:XXX\build\CMakeFiles\3.27.0\VCTargetsPath.vcxproj”(默认目标)的操作 - 失败。<br><br>    生成失败。<br><br>    “E:XXX\build\CMakeFiles\3.27.0\VCTargetsPath.vcxproj”(默认目标) (1) -&gt;<br>      E:XXX\build\CMakeFiles\3.27.0\VCTargetsPath.vcxproj(14,2): error MSB4019: 未找到导入的项目“E:\Microsoft.Cpp.Default.props”。请确认 &lt;Import&gt; 声明中的路径正确，且磁盘上存在该文件。<br><br>        0 个警告<br>        1 个错误<br><br>    已用时间 00:00:00.01<br><br><br>  Exit code: 1<br><br><br><br>-- Configuring incomplete, errors occurred!<br></code></pre></td></tr></table></figure><h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><ul><li><strong>检查MSBuild.exe是否存在</strong>查看报错，发现是未能执行<code>C:/Program Files (x86)/MSBuild/14.0/bin/MSBuild.exe</code>，检查路径确实存在改文件，当安装了相应的SDK后文件就会默认安装到这个目录。</li><li><strong>环境变量检查</strong>确保<code>VCTargetsPath</code>环境变量已被正确设置。使用Everything搜了一下发现<code>Microsoft.Cpp.Default.props</code> 确实不在E盘而是在C盘，它的路径应该是被重写了，可以手动为当前会话设置它。例如：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">set</span> VCTargetsPath=C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140<br></code></pre></td></tr></table></figure>设置后发现问题解决了。</li></ul><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这个问题的出现可能是由于一下几个原因：</p><ul><li><strong>安装顺序</strong>先安装了cmake再安装VS</li><li><strong>多版本visual studio</strong>装了很多版本的编译器，可能环境变量一直被改动</li></ul>]]></content>
+    
+    
+    <categories>
+      
+      <category>随笔</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>cmake</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>std::string作为函数返回值</title>
     <link href="/2023/03/18/2023-3-19-std-string%E4%BD%9C%E4%B8%BA%E5%87%BD%E6%95%B0%E8%BF%94%E5%9B%9E%E5%80%BC/"/>
     <url>/2023/03/18/2023-3-19-std-string%E4%BD%9C%E4%B8%BA%E5%87%BD%E6%95%B0%E8%BF%94%E5%9B%9E%E5%80%BC/</url>

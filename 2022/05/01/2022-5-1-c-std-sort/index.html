@@ -1,0 +1,689 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar.png">
+  <link rel="icon" href="/img/avatar.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="水果挺甜">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="STL的std::sort函数是基于Musser在1996年提出的内省排序（Introspective sort）算法实现。这个算法是个缝合怪，它汲取了插入排序、堆排序以及快排的优点：针对大数据量，使用快排，时间复杂度是O(NlogN)；若快排递归深度超过阈值__depth_limit ，改用堆排序，防止快排递归过深，同时保持时间复杂度仍是O(NlogN)；当数据规模小于阈值_S_threshol">
+<meta property="og:type" content="article">
+<meta property="og:title" content="std::sort">
+<meta property="og:url" content="https://tthres.github.io/2022/05/01/2022-5-1-c-std-sort/index.html">
+<meta property="og:site_name" content="水果挺甜&#39;blog">
+<meta property="og:description" content="STL的std::sort函数是基于Musser在1996年提出的内省排序（Introspective sort）算法实现。这个算法是个缝合怪，它汲取了插入排序、堆排序以及快排的优点：针对大数据量，使用快排，时间复杂度是O(NlogN)；若快排递归深度超过阈值__depth_limit ，改用堆排序，防止快排递归过深，同时保持时间复杂度仍是O(NlogN)；当数据规模小于阈值_S_threshol">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-05-01T10:18:59.000Z">
+<meta property="article:modified_time" content="2023-03-08T09:33:30.341Z">
+<meta property="article:author" content="水果挺甜">
+<meta property="article:tag" content="c++">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>std::sort - 水果挺甜&#39;blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"tthres.github.io","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>水果挺甜&#39;blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="std::sort"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-05-01 18:18" pubdate>
+          2022年5月1日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          30 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">std::sort</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h4 id="STL的std-sort函数是基于Musser在1996年提出的内省排序（Introspective-sort）算法实现。这个算法是个缝合怪，它汲取了插入排序、堆排序以及快排的优点："><a href="#STL的std-sort函数是基于Musser在1996年提出的内省排序（Introspective-sort）算法实现。这个算法是个缝合怪，它汲取了插入排序、堆排序以及快排的优点：" class="headerlink" title="STL的std::sort函数是基于Musser在1996年提出的内省排序（Introspective sort）算法实现。这个算法是个缝合怪，它汲取了插入排序、堆排序以及快排的优点："></a>STL的std::sort函数是基于Musser在1996年提出的内省排序（Introspective sort）算法实现。这个算法是个缝合怪，它汲取了插入排序、堆排序以及快排的优点：<br></h4><p>针对大数据量，使用快排，时间复杂度是O(NlogN)；<br><br>若快排递归深度超过阈值__depth_limit ，改用堆排序，防止快排递归过深，同时保持时间复杂度仍是O(NlogN)；<br><br>当数据规模小于阈值_S_threshold时，改用插入排序。<br></p>
+<h4 id="这里使用快速排序加插入排序实现。"><a href="#这里使用快速排序加插入排序实现。" class="headerlink" title="这里使用快速排序加插入排序实现。"></a>这里使用快速排序加插入排序实现。</h4><h2 id="std-sort的使用"><a href="#std-sort的使用" class="headerlink" title="std::sort的使用"></a>std::sort的使用</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-type">int</span> arr[<span class="hljs-number">100</span>], n;<br>    cin &gt;&gt; n;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; n; i++) cin &gt;&gt; arr[i];<br>    <span class="hljs-built_in">sort</span>(arr, arr + n); <span class="hljs-comment">// 默认从小到大排列</span><br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; n; i++) cout &lt;&lt; arr[i] &lt;&lt; <span class="hljs-string">&quot; &quot;</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h4 id="可以自定义排序规则"><a href="#可以自定义排序规则" class="headerlink" title="可以自定义排序规则"></a>可以自定义排序规则</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">cmp1</span><span class="hljs-params">(<span class="hljs-type">int</span> a, <span class="hljs-type">int</span> b)</span> </span>&#123; <span class="hljs-comment">// 自定义函数</span><br>    <span class="hljs-keyword">return</span> a &gt; b;<br>&#125;<br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">CMP</span> &#123;               <span class="hljs-comment">// 自定义函数对象</span><br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">operator</span><span class="hljs-params">()</span><span class="hljs-params">(<span class="hljs-type">int</span> a, <span class="hljs-type">int</span> b)</span></span>&#123;<br>        <span class="hljs-keyword">return</span> a &lt; b;<br>    &#125;<br>&#125;;<br><br><span class="hljs-built_in">sort</span>(arr, arr + n, cmp1); <span class="hljs-comment">// 从大到小排列</span><br>CMP cmp2;<br><span class="hljs-built_in">sort</span>(arr, arr + n, cmp2); <span class="hljs-comment">// 传入函数对象</span><br><span class="hljs-built_in">sort</span>(arr, arr + n, [](<span class="hljs-type">int</span> a, <span class="hljs-type">int</span> b)&#123;<span class="hljs-keyword">return</span> a &lt; b;&#125;);      <span class="hljs-comment">// lamda表达式</span><br></code></pre></td></tr></table></figure>
+<h2 id="sort实现"><a href="#sort实现" class="headerlink" title="sort实现"></a>sort实现</h2><h4 id="根据传入参数可以看出应该传入待排序数组的首位指针和排序规则，所以函数参数应该为int-first-int-last-function-lt-bool-int-int-gt-cmp。其中function默认从小到大排列。"><a href="#根据传入参数可以看出应该传入待排序数组的首位指针和排序规则，所以函数参数应该为int-first-int-last-function-lt-bool-int-int-gt-cmp。其中function默认从小到大排列。" class="headerlink" title="根据传入参数可以看出应该传入待排序数组的首位指针和排序规则，所以函数参数应该为int *first, int *last, function&lt;bool(int, int)&gt; cmp。其中function默认从小到大排列。"></a>根据传入参数可以看出应该传入待排序数组的首位指针和排序规则，所以函数参数应该为int *first, int *last, function&lt;bool(int, int)&gt; cmp。其中function默认从小到大排列。</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">sort_</span><span class="hljs-params">(<span class="hljs-type">int</span> *first, <span class="hljs-type">int</span> *last, function&lt;<span class="hljs-type">bool</span>(<span class="hljs-type">int</span>, <span class="hljs-type">int</span>)&gt; cmp = less&lt;<span class="hljs-type">int</span>&gt;())</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-comment">// 快速排序</span><br>    <span class="hljs-keyword">if</span> (first &gt;= last) <span class="hljs-keyword">return</span> ;<br>    <span class="hljs-type">int</span> *x = first, *y = last - <span class="hljs-number">1</span>, base = *first;<br>    <span class="hljs-keyword">while</span> (x &lt; y)<br>    &#123;<br>        <span class="hljs-keyword">while</span> (x &lt; y &amp;&amp; <span class="hljs-built_in">cmp</span>(base, *y)) --y;<br>        <span class="hljs-keyword">if</span> (x &lt; y) *(x++) = *y;<br>        <span class="hljs-keyword">while</span> (x &lt; y &amp;&amp; <span class="hljs-built_in">cmp</span>(*x, base)) ++x;<br>        <span class="hljs-keyword">if</span> (x &lt; y) *(y--) = *x;<br>    &#125;<br>    *x = base;<br>    <span class="hljs-built_in">sort_</span>(first, x, cmp);<br>    <span class="hljs-built_in">sort_</span>(x + <span class="hljs-number">1</span>, last, cmp);<br>    <span class="hljs-keyword">return</span> ;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h2 id="加入迭代器"><a href="#加入迭代器" class="headerlink" title="加入迭代器"></a>加入迭代器</h2><h4 id="根据stl的源码可知sort函数只接受两个-RandomAccessIterator（随机存取迭代器）。可以对上面的代码进行改进。同时加入threshold，当快速排序迭代的last-first-lt-threshold时，改用插入排序，另外快速排序使用单边递归减少递归次数。"><a href="#根据stl的源码可知sort函数只接受两个-RandomAccessIterator（随机存取迭代器）。可以对上面的代码进行改进。同时加入threshold，当快速排序迭代的last-first-lt-threshold时，改用插入排序，另外快速排序使用单边递归减少递归次数。" class="headerlink" title="根据stl的源码可知sort函数只接受两个_RandomAccessIterator（随机存取迭代器）。可以对上面的代码进行改进。同时加入threshold，当快速排序迭代的last - first &lt;= threshold时，改用插入排序，另外快速排序使用单边递归减少递归次数。"></a>根据stl的源码可知sort函数只接受两个_RandomAccessIterator（随机存取迭代器）。可以对上面的代码进行改进。同时加入threshold，当快速排序迭代的last - first &lt;= threshold时，改用插入排序，另外快速排序使用单边递归减少递归次数。</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">sort_</span><span class="hljs-params">(RandomIter first, RandomIter last, function&lt;<span class="hljs-type">bool</span>(<span class="hljs-type">int</span>, <span class="hljs-type">int</span>)&gt; cmp = less&lt;<span class="hljs-type">int</span>&gt;())</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-built_in">intro_loop</span>(first, last, cmp); <span class="hljs-comment">// 用快速排序分为16个元素一组</span><br>    <span class="hljs-built_in">insert_sort</span>(first, last, cmp); <span class="hljs-comment">// 对快速排序后的每组16个元素进行插入排序</span><br>&#125;<br></code></pre></td></tr></table></figure>
+<h4 id="快排的实现"><a href="#快排的实现" class="headerlink" title="快排的实现"></a>快排的实现</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">intro_loop</span><span class="hljs-params">(RandomIter first, RandomIter last, function&lt;<span class="hljs-type">bool</span>(<span class="hljs-type">int</span>, <span class="hljs-type">int</span>)&gt; cmp = less&lt;<span class="hljs-type">int</span>&gt;())</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">while</span> (last - first &gt; threshold)<br>    &#123;<br>        RandomIter x = first, y = last - <span class="hljs-number">1</span>;<br>        <span class="hljs-type">int</span> base = *first;<br>        <span class="hljs-keyword">do</span>&#123;<br>            <span class="hljs-keyword">while</span> (<span class="hljs-built_in">cmp</span>(*x, base)) ++x;<br>            <span class="hljs-keyword">while</span> (<span class="hljs-built_in">cmp</span>(base, *y)) --y;<br>            <span class="hljs-keyword">if</span> (x &lt; y)<br>            &#123;<br>                <span class="hljs-built_in">swap</span>(*x, *y);<br>                ++x, --y;<br>            &#125;<br>        &#125;<span class="hljs-keyword">while</span> (x &lt;= y);<br>        <span class="hljs-built_in">intro_loop</span>(x, last, cmp); <span class="hljs-comment">// 单边递归</span><br>        last = y + <span class="hljs-number">1</span>;<br>    &#125;<br>    <span class="hljs-keyword">return</span> ;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+<h4 id="插入排序实现"><a href="#插入排序实现" class="headerlink" title="插入排序实现"></a>插入排序实现</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">insert_sort</span><span class="hljs-params">(RandomIter first, RandomIter last, function&lt;<span class="hljs-type">bool</span>(<span class="hljs-type">int</span>, <span class="hljs-type">int</span>)&gt; cmp = less&lt;<span class="hljs-type">int</span>&gt;())</span></span><br><span class="hljs-function"></span>&#123;<br>    RandomIter ind = first;<br>    <span class="hljs-keyword">for</span> (RandomIter x = first + <span class="hljs-number">1</span>; x &lt; last; ++x)<br>    &#123;<br>        <span class="hljs-keyword">if</span> (<span class="hljs-built_in">cmp</span>(*x, *ind)) ind = x;<br>    &#125;<br>    <span class="hljs-keyword">while</span> (ind != first)<br>    &#123;<br>        <span class="hljs-built_in">swap</span>(*ind, *(ind - <span class="hljs-number">1</span>));<br>        --ind;<br>    &#125;<br>    <span class="hljs-keyword">for</span> (RandomIter x = first + <span class="hljs-number">2</span>; x &lt; last; ++x)<br>    &#123;<br>        RandomIter j = x;<br>        <span class="hljs-keyword">while</span> (<span class="hljs-built_in">cmp</span>(*j, *(j - <span class="hljs-number">1</span>)))<br>        &#123;<br>            <span class="hljs-built_in">swap</span>(*j, *(j - <span class="hljs-number">1</span>));<br>            --j;<br>        &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> ;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+<h4 id="随机迭代器的实现"><a href="#随机迭代器的实现" class="headerlink" title="随机迭代器的实现"></a>随机迭代器的实现</h4><p>1、迭代器在函数中应该和指针一样使用。所以迭代器应该定义为一类指针对象。<br><br>2、在sort函数中传入的是int*类型的指针，所以随机迭代器的构造函数应该将指针转为自身的成员变量存储。<br><br>3、迭代器应该支持指针的各种功能。<br></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">class</span> <span class="hljs-title class_">RandomIter</span>&#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-built_in">RandomIter</span>(<span class="hljs-type">int</span> *ptr) : <span class="hljs-built_in">ptr</span>(ptr) &#123;&#125;<br><br>    <span class="hljs-type">int</span> &amp;<span class="hljs-keyword">operator</span>*() &#123; <span class="hljs-keyword">return</span> *ptr; &#125; <span class="hljs-comment">// 重载*</span><br><br>    RandomIter <span class="hljs-keyword">operator</span>+(<span class="hljs-type">int</span> x) &#123; <span class="hljs-keyword">return</span> <span class="hljs-built_in">RandomIter</span>(ptr + x); &#125; <span class="hljs-comment">// 支持迭代器 +/- 整数</span><br>    RandomIter <span class="hljs-keyword">operator</span>-(<span class="hljs-type">int</span> x) &#123; <span class="hljs-keyword">return</span> <span class="hljs-built_in">RandomIter</span>(ptr - x); &#125;<br><br>    <span class="hljs-type">int</span> <span class="hljs-keyword">operator</span>-(<span class="hljs-type">const</span> RandomIter &amp;iter) &#123; <span class="hljs-keyword">return</span> ptr - iter.ptr; &#125; <span class="hljs-comment">// 迭代器之间运算</span><br><br>    RandomIter &amp;<span class="hljs-keyword">operator</span>++() &#123; ++ptr; <span class="hljs-keyword">return</span> *<span class="hljs-keyword">this</span>; &#125; <span class="hljs-comment">//前++</span><br>    RandomIter &amp;<span class="hljs-keyword">operator</span>--() &#123; --ptr; <span class="hljs-keyword">return</span> *<span class="hljs-keyword">this</span>; &#125; <span class="hljs-comment">// 前--</span><br><br>    <span class="hljs-comment">// 比较运算符重载</span><br>    <span class="hljs-type">bool</span> <span class="hljs-keyword">operator</span>&lt;(<span class="hljs-type">const</span> RandomIter &amp;iter) <span class="hljs-type">const</span> &#123; <span class="hljs-keyword">return</span> ptr &lt; iter.ptr; &#125;<br>    <span class="hljs-type">bool</span> <span class="hljs-keyword">operator</span>&gt;(<span class="hljs-type">const</span> RandomIter &amp;iter) <span class="hljs-type">const</span> &#123; <span class="hljs-keyword">return</span> iter &lt; *<span class="hljs-keyword">this</span>; &#125;<br>    <span class="hljs-type">bool</span> <span class="hljs-keyword">operator</span>&lt;=(<span class="hljs-type">const</span> RandomIter &amp;iter) <span class="hljs-type">const</span> &#123; <span class="hljs-keyword">return</span> !(*<span class="hljs-keyword">this</span> &gt; iter); &#125;<br>    <span class="hljs-type">bool</span> <span class="hljs-keyword">operator</span>&gt;=(<span class="hljs-type">const</span> RandomIter &amp;iter) <span class="hljs-type">const</span> &#123; <span class="hljs-keyword">return</span> !(*<span class="hljs-keyword">this</span> &lt; iter); &#125;<br>    <span class="hljs-type">bool</span> <span class="hljs-keyword">operator</span>==(<span class="hljs-type">const</span> RandomIter &amp;iter) <span class="hljs-type">const</span> &#123; <span class="hljs-keyword">return</span> !(*<span class="hljs-keyword">this</span> &gt; iter) &amp;&amp; !(*<span class="hljs-keyword">this</span> &lt; iter); &#125;<br>    <span class="hljs-type">bool</span> <span class="hljs-keyword">operator</span>!=(<span class="hljs-type">const</span> RandomIter &amp;iter) <span class="hljs-type">const</span> &#123; <span class="hljs-keyword">return</span> !(*<span class="hljs-keyword">this</span> == (iter.ptr)); &#125;<br><span class="hljs-keyword">private</span>:<br>    <span class="hljs-type">int</span> *ptr;<br>&#125;;<br></code></pre></td></tr></table></figure>
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E9%9A%8F%E7%AC%94/" class="category-chain-item">随笔</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/c/">#c++</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>std::sort</div>
+      <div>https://tthres.github.io/2022/05/01/2022-5-1-c-std-sort/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>水果挺甜</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年5月1日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/05/04/2022-5-4-c-%E5%93%88%E5%B8%8C%E8%A1%A8/" title="C++哈希表">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">C++哈希表</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/04/19/2022-4-19-c-%E8%BF%94%E5%9B%9E%E5%80%BC%E4%BC%98%E5%8C%96/" title="C++返回值优化">
+                        <span class="hidden-mobile">C++返回值优化</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'tthres/tthres.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

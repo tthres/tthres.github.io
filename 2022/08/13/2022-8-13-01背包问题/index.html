@@ -1,0 +1,826 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar.png">
+  <link rel="icon" href="/img/avatar.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="水果挺甜">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="0-1背包问题有一个背包，它的容量为C，现在有n种不同的物品，编号为0~~~n - 1，其中每件物品的重量（weight）为w(i),价值（value）为v(i)。问可以向这个背包中盛放哪些物品，使得在不超过背包容量的基础上，物品的总价值最大。 递归如果只用递归，相当于暴力解法，因为01背包问题相当于求n个物品的组合，使得这些物品能放进背包且物品的总价值最大。那么一共有多少种组合呢，我们可以对每一">
+<meta property="og:type" content="article">
+<meta property="og:title" content="01背包 递归→记忆化搜索→动态规划">
+<meta property="og:url" content="https://tthres.github.io/2022/08/13/2022-8-13-01%E8%83%8C%E5%8C%85%E9%97%AE%E9%A2%98/index.html">
+<meta property="og:site_name" content="水果挺甜&#39;blog">
+<meta property="og:description" content="0-1背包问题有一个背包，它的容量为C，现在有n种不同的物品，编号为0~~~n - 1，其中每件物品的重量（weight）为w(i),价值（value）为v(i)。问可以向这个背包中盛放哪些物品，使得在不超过背包容量的基础上，物品的总价值最大。 递归如果只用递归，相当于暴力解法，因为01背包问题相当于求n个物品的组合，使得这些物品能放进背包且物品的总价值最大。那么一共有多少种组合呢，我们可以对每一">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tthres.github.io/img/2022-8-13-01%E8%83%8C%E5%8C%85/01%E8%83%8C%E5%8C%85%E5%B0%81%E9%9D%A2.jpg">
+<meta property="article:published_time" content="2022-08-13T09:25:45.000Z">
+<meta property="article:modified_time" content="2023-03-08T09:33:30.341Z">
+<meta property="article:author" content="水果挺甜">
+<meta property="article:tag" content="algorithm">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://tthres.github.io/img/2022-8-13-01%E8%83%8C%E5%8C%85/01%E8%83%8C%E5%8C%85%E5%B0%81%E9%9D%A2.jpg">
+  
+  
+  
+  <title>01背包 递归→记忆化搜索→动态规划 - 水果挺甜&#39;blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"tthres.github.io","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>水果挺甜&#39;blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="01背包 递归→记忆化搜索→动态规划"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-08-13 17:25" pubdate>
+          2022年8月13日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4.3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          36 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">01背包 递归→记忆化搜索→动态规划</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="0-1背包问题"><a href="#0-1背包问题" class="headerlink" title="0-1背包问题"></a>0-1背包问题</h1><p>有一个背包，它的容量为C，现在有n种不同的物品，编号为0~~~n - 1，其中每件物品的重量（weight）为w(i),价值（value）为v(i)。问可以向这个背包中盛放哪些物品，使得在不超过背包容量的基础上，物品的总价值最大。</p>
+<h1 id="递归"><a href="#递归" class="headerlink" title="递归"></a>递归</h1><p>如果只用递归，相当于暴力解法，因为01背包问题相当于求n个物品的组合，使得这些物品能放进背包且物品的总价值最大。<br><br>那么一共有多少种组合呢，我们可以对每一件物品都进行选择放入背包或者不放入。n件物品，将有 2^n 种可能，组合之后还要计算出小于容量的组合，最后选出其中最大的，所以暴力递归的时间复杂度为 O((2^n) * n)。</p>
+<h2 id="递归解法"><a href="#递归解法" class="headerlink" title="递归解法"></a>递归解法</h2><p>设定 F(n, C) 含义为：考虑将n个物品放入容量为C的背包，使得价值最大。可以得出：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs reasonml"><span class="hljs-constructor">F(<span class="hljs-params">i</span>, <span class="hljs-params">c</span>)</span> = <span class="hljs-constructor">F(<span class="hljs-params">i</span> - 1, <span class="hljs-params">c</span>)</span>                  <br>        = v(i) + <span class="hljs-constructor">F(<span class="hljs-params">i</span> - 1, <span class="hljs-params">c</span> - <span class="hljs-params">w</span>(<span class="hljs-params">i</span>)</span>)<br></code></pre></td></tr></table></figure>
+<p>当我们要放进 i 个物品进入容量为 c 的背包时，我们有两种策略：<br/><br>①、来了一个新的物品（i），但这个物品我们不需要放进背包。  <br/><br>②、来了一个新的物品（i），我们需要选择将它放进背包，所以此时的总价值需要加上当前的v(i)。而由于第 i 个物品已经放入背包中了，剩下的容量变为c - w（i）。  <br/><br>所以要求F(i, c)就是求出这两种策略的最大值，可以得出状态转移方程为：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs reasonml"><span class="hljs-constructor">F(<span class="hljs-params">i</span>, <span class="hljs-params">c</span>)</span> = max(<span class="hljs-constructor">F(<span class="hljs-params">i</span> - 1, <span class="hljs-params">c</span>)</span>, v(i) + <span class="hljs-constructor">F(<span class="hljs-params">i</span> - 1, <span class="hljs-params">c</span> - <span class="hljs-params">w</span>(<span class="hljs-params">i</span>)</span>))<br></code></pre></td></tr></table></figure>
+<p>这个状态转移方程是自顶向下的，可以写出递归的代码：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Knapsack01</span>&#123;<br><br><span class="hljs-keyword">private</span>:<br><br>    <span class="hljs-comment">// 用 [0...index]的物品,填充容积为c的背包的最大价值</span><br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">bestValue</span><span class="hljs-params">(<span class="hljs-type">const</span> vector&lt;<span class="hljs-type">int</span>&gt; &amp;w, <span class="hljs-type">const</span> vector&lt;<span class="hljs-type">int</span>&gt; &amp;v, <span class="hljs-type">int</span> index, <span class="hljs-type">int</span> c)</span></span>&#123;<br><br>        <span class="hljs-keyword">if</span>(c &lt;= <span class="hljs-number">0</span> || index &lt; <span class="hljs-number">0</span>)<br>            <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br><br>        <span class="hljs-type">int</span> res = <span class="hljs-built_in">bestValue</span>(w, v, index<span class="hljs-number">-1</span>, c);  <span class="hljs-comment">// 策略①</span><br>        <span class="hljs-keyword">if</span>(c &gt;= w[index])                       <span class="hljs-comment">// 策略②</span><br>            res = <span class="hljs-built_in">max</span>(res, v[index] + <span class="hljs-built_in">bestValue</span>(w, v, index - <span class="hljs-number">1</span>, c - w[index]));<br><br>        <span class="hljs-keyword">return</span> res;<br>    &#125;<br><br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">knapsack01</span><span class="hljs-params">(<span class="hljs-type">const</span> vector&lt;<span class="hljs-type">int</span>&gt; &amp;w, <span class="hljs-type">const</span> vector&lt;<span class="hljs-type">int</span>&gt; &amp;v, <span class="hljs-type">int</span> C)</span></span>&#123;<br><br>        <span class="hljs-type">int</span> n = w.<span class="hljs-built_in">size</span>();<br>        <span class="hljs-keyword">if</span>(n == <span class="hljs-number">0</span> || C == <span class="hljs-number">0</span>)<br>            <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br><br>        <span class="hljs-keyword">return</span> <span class="hljs-built_in">bestValue</span>(w, v, n - <span class="hljs-number">1</span>, C);<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<h1 id="记忆化搜索"><a href="#记忆化搜索" class="headerlink" title="记忆化搜索"></a>记忆化搜索</h1><p>递归存在太多重复计算，我们可以用一个数组记录计算过的结果:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">/* 记忆化搜索</span><br><span class="hljs-comment">        时间复杂度: O(n * C) 其中n为物品个数; C为背包容积</span><br><span class="hljs-comment">        空间复杂度: O(n * C)</span><br><span class="hljs-comment">*/</span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Knapsack01</span>&#123;<br><br><span class="hljs-keyword">private</span>:<br>    vector&lt;vector&lt;<span class="hljs-type">int</span>&gt;&gt; memo;<br><br>    <span class="hljs-comment">// 用 [0...index]的物品,填充容积为c的背包的最大价值</span><br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">bestValue</span><span class="hljs-params">(<span class="hljs-type">const</span> vector&lt;<span class="hljs-type">int</span>&gt; &amp;w, <span class="hljs-type">const</span> vector&lt;<span class="hljs-type">int</span>&gt; &amp;v, <span class="hljs-type">int</span> index, <span class="hljs-type">int</span> c)</span></span>&#123;<br><br>        <span class="hljs-keyword">if</span>(c &lt;= <span class="hljs-number">0</span> || index &lt; <span class="hljs-number">0</span>)<br>            <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br><br>        <span class="hljs-keyword">if</span>(memo[index][c] != <span class="hljs-number">-1</span>)<br>            <span class="hljs-keyword">return</span> memo[index][c];<br><br>        <span class="hljs-type">int</span> res = <span class="hljs-built_in">bestValue</span>(w, v, index<span class="hljs-number">-1</span>, c);<br>        <span class="hljs-keyword">if</span>(c &gt;= w[index])<br>            res = <span class="hljs-built_in">max</span>(res, v[index] + <span class="hljs-built_in">bestValue</span>(w, v, index - <span class="hljs-number">1</span>, c - w[index]));<br>        memo[index][c] = res;<br>        <span class="hljs-keyword">return</span> res;<br>    &#125;<br><br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">knapsack01</span><span class="hljs-params">(<span class="hljs-type">const</span> vector&lt;<span class="hljs-type">int</span>&gt; &amp;w, <span class="hljs-type">const</span> vector&lt;<span class="hljs-type">int</span>&gt; &amp;v, <span class="hljs-type">int</span> C)</span></span>&#123;<br>        <span class="hljs-type">int</span> n = w.<span class="hljs-built_in">size</span>();<br>        <span class="hljs-keyword">if</span>(n == <span class="hljs-number">0</span> || C == <span class="hljs-number">0</span>)<br>            <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br><br>        memo.<span class="hljs-built_in">clear</span>();<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">0</span> ; i &lt; n ; i ++)<br>            memo.<span class="hljs-built_in">push_back</span>(<span class="hljs-built_in">vector</span>&lt;<span class="hljs-type">int</span>&gt;(C + <span class="hljs-number">1</span>, <span class="hljs-number">-1</span>));<br>        <span class="hljs-keyword">return</span> <span class="hljs-built_in">bestValue</span>(w, v, n - <span class="hljs-number">1</span>, C);<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<h1 id="动态规划"><a href="#动态规划" class="headerlink" title="动态规划"></a>动态规划</h1><p>上面的都是自顶向下的思路，动态规划可以采用自底向上的方法来解决。<br/><br>背包问题的记忆是在一个二维数组中，我们可以创建一个dp[i][c]的二维数组，其中 i 表示我们考虑放入的是哪个物品，c表示背包的容量。下面举一个例子：背包的容量为5，可放入的物品如下：</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">id</span>              <span class="hljs-number">0</span>               <span class="hljs-number">1</span>               <span class="hljs-number">2</span><br><span class="hljs-attribute">weight</span>          <span class="hljs-number">1</span>               <span class="hljs-number">2</span>               <span class="hljs-number">3</span><br><span class="hljs-attribute">value</span>           <span class="hljs-number">6</span>               <span class="hljs-number">10</span>              <span class="hljs-number">12</span><br></code></pre></td></tr></table></figure>
+<p>可以创建数组：</p>
+<table>
+  <tr>
+    <th> </th>
+    <th>0</th>
+    <th>1</th>
+    <th>2</th>
+    <th>3</th>
+    <th>4</th>
+    <th>5</th>
+  </tr>
+  <tr>
+    <td>0</td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+  </tr>
+</table>
+
+<p>在数组的（2， 5）位置就是所要求的结果。<br/><br>下面先对第一行进行填充，第一行表示的就是当只有0号物品时，随背包容量增加是否将物品放入背包；由于只有0号物品，一定会放入背包的。数组的值就表示此时背包的最大价值。</p>
+<table>
+  <tr>
+    <th> </th>
+    <th>0</th>
+    <th>1</th>
+    <th>2</th>
+    <th>3</th>
+    <th>4</th>
+    <th>5</th>
+  </tr>
+  <tr>
+    <td>0</td>
+    <td>0</td>
+    <td>6</td>
+    <td>6</td>
+    <td>6</td>
+    <td>6</td>
+    <td>6</td>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+  </tr>
+</table>
+
+<p>接下来考虑第一行：第一行所表达的含义是，当有 0 ，1 这两个物品时相对应的背包价值有什么变化；<br/><br>首先是（1， 0）位置，为0， 因为背包容量为0时放不进任何物品；（1， 1）位置为6，此时要考虑能否放进1号物品，不能放进的话照抄上面一行就行，由于容量为1，只能放进0号物品，所以为6；（1， 2）位置为10，此时要考虑是否将1号物品放入背包，当不放时结果就是（0， 2）的值为6，当决定要放1号物品时由于这时背包容量只有2，所以要加上当不考虑1号物品，容积为0的值，就是（0， 0）的值为0，所以最终结果为0 + 10与6的最大值，取10；剩下的（1， 3）也是同理，考虑不将1号物品放入背包时值依然是6， 考虑要放入1号物品时就要去看（0， 1）位置的值加上1号物品的值为6 + 10再与6比较，取16。后面依次计算比较即可。<br><br/><br>最后结果：</p>
+<table>
+  <tr>
+    <th> </th>
+    <th>0</th>
+    <th>1</th>
+    <th>2</th>
+    <th>3</th>
+    <th>4</th>
+    <th>5</th>
+  </tr>
+  <tr>
+    <td>0</td>
+    <td>0</td>
+    <td>6</td>
+    <td>6</td>
+    <td>6</td>
+    <td>6</td>
+    <td>6</td>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>0</td>
+    <td>6</td>
+    <td>10</td>
+    <td>16</td>
+    <td>16</td>
+    <td>16</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td>0</td>
+    <td>6</td>
+    <td>10</td>
+    <td>16</td>
+    <td>18</td>
+    <td>22</td>
+  </tr>
+</table>
+
+<h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">/*动态规划</span><br><span class="hljs-comment">        时间复杂度: O(n * C) 其中n为物品个数; C为背包容积</span><br><span class="hljs-comment">        空间复杂度: O(n * C)</span><br><span class="hljs-comment"> */</span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Knapsack01</span>&#123;<br><br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">knapsack01</span><span class="hljs-params">(<span class="hljs-type">const</span> vector&lt;<span class="hljs-type">int</span>&gt; &amp;w, <span class="hljs-type">const</span> vector&lt;<span class="hljs-type">int</span>&gt; &amp;v, <span class="hljs-type">int</span> C)</span></span>&#123;<br><br>        <span class="hljs-type">int</span> n = w.<span class="hljs-built_in">size</span>();<br>        <span class="hljs-keyword">if</span>(n == <span class="hljs-number">0</span> || C == <span class="hljs-number">0</span>)<br>            <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br><br>        vector&lt;vector&lt;<span class="hljs-type">int</span>&gt;&gt; <span class="hljs-built_in">memo</span>(n, <span class="hljs-built_in">vector</span>&lt;<span class="hljs-type">int</span>&gt;(C + <span class="hljs-number">1</span>,<span class="hljs-number">0</span>));<br><br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j = <span class="hljs-number">0</span> ; j &lt;= C ; j ++)<br>            memo[<span class="hljs-number">0</span>][j] = (j &gt;= w[<span class="hljs-number">0</span>] ? v[<span class="hljs-number">0</span>] : <span class="hljs-number">0</span> );<br><br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">1</span> ; i &lt; n ; i ++)<br>            <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j = <span class="hljs-number">0</span> ; j &lt;= C ; j ++)&#123;<br>                memo[i][j] = memo[i<span class="hljs-number">-1</span>][j];      <span class="hljs-comment">// 策略1</span><br>                <span class="hljs-keyword">if</span>(j &gt;= w[i])                   <span class="hljs-comment">// 策略2</span><br>                    memo[i][j] = <span class="hljs-built_in">max</span>(memo[i][j], v[i] + memo[i - <span class="hljs-number">1</span>][j - w[i]]);<br>            &#125;<br>        <span class="hljs-keyword">return</span> memo[n - <span class="hljs-number">1</span>][C];<br>    &#125;<br>&#125;;<br><br></code></pre></td></tr></table></figure>
+
+<h1 id="优化"><a href="#优化" class="headerlink" title="优化"></a>优化</h1><p>空间复杂度可以优化：</p>
+<h2 id="Ⅰ"><a href="#Ⅰ" class="headerlink" title="Ⅰ"></a>Ⅰ</h2><p>对于状态转移方程：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs reasonml"><span class="hljs-constructor">F(<span class="hljs-params">i</span>, <span class="hljs-params">c</span>)</span> = max(<span class="hljs-constructor">F(<span class="hljs-params">i</span> - 1, <span class="hljs-params">c</span>)</span>, v(i) + <span class="hljs-constructor">F(<span class="hljs-params">i</span> - 1, <span class="hljs-params">c</span> - <span class="hljs-params">w</span>(<span class="hljs-params">i</span>)</span>))<br></code></pre></td></tr></table></figure>
+<p>第i行元素只依赖于i - 1行元素，理论上只需保持两行元素即可，可以将空间复杂度从O(n * C)-&gt;O(2 * C) = O(C)。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Knapsack01</span>&#123;<br><br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">knapsack01</span><span class="hljs-params">(<span class="hljs-type">const</span> vector&lt;<span class="hljs-type">int</span>&gt; &amp;w, <span class="hljs-type">const</span> vector&lt;<span class="hljs-type">int</span>&gt; &amp;v, <span class="hljs-type">int</span> C)</span></span>&#123;<br><br>        <span class="hljs-type">int</span> n = w.<span class="hljs-built_in">size</span>();<br>        <span class="hljs-keyword">if</span>(n == <span class="hljs-number">0</span> || C == <span class="hljs-number">0</span>)<br>            <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br><br>        vector&lt;vector&lt;<span class="hljs-type">int</span>&gt;&gt; <span class="hljs-built_in">memo</span>(<span class="hljs-number">2</span>, <span class="hljs-built_in">vector</span>&lt;<span class="hljs-type">int</span>&gt;(C + <span class="hljs-number">1</span>,<span class="hljs-number">0</span>));<br><br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j = <span class="hljs-number">0</span> ; j &lt;= C ; j ++)<br>            memo[<span class="hljs-number">0</span>][j] = (j &gt;= w[<span class="hljs-number">0</span>] ? v[<span class="hljs-number">0</span>] : <span class="hljs-number">0</span> );<br><br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">1</span> ; i &lt; n ; i ++)<br>            <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j = <span class="hljs-number">0</span> ; j &lt;= C ; j ++)&#123;<br>                memo[i % <span class="hljs-number">2</span>][j] = memo[(i<span class="hljs-number">-1</span>) % <span class="hljs-number">2</span>][j];      <span class="hljs-comment">// 策略1</span><br>                <span class="hljs-keyword">if</span>(j &gt;= w[i])                             <span class="hljs-comment">// 策略2</span><br>                    memo[i % <span class="hljs-number">2</span>][j] = <span class="hljs-built_in">max</span>(memo[i % <span class="hljs-number">2</span>][j], v[i] + memo[(i - <span class="hljs-number">1</span>) % <span class="hljs-number">2</span>][j - w[i]]);<br>            &#125;<br>        <span class="hljs-keyword">return</span> memo[(n - <span class="hljs-number">1</span>) % <span class="hljs-number">2</span>][C];<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<h2 id="Ⅱ"><a href="#Ⅱ" class="headerlink" title="Ⅱ"></a>Ⅱ</h2><p>还可以只使用一行大小为C的数组完成动态规划：当我们需要上一行的元素进行计算时，我们永远只需要待计算元素的上边和左边的元素就行，对于右面的元素不需要。那么就可以单行从右向左来刷新数组中的内容，直接看代码：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Knapsack01</span>&#123;<br><br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">knapsack01</span><span class="hljs-params">(<span class="hljs-type">const</span> vector&lt;<span class="hljs-type">int</span>&gt; &amp;w, <span class="hljs-type">const</span> vector&lt;<span class="hljs-type">int</span>&gt; &amp;v, <span class="hljs-type">int</span> C)</span></span>&#123;<br><br>        <span class="hljs-type">int</span> n = w.<span class="hljs-built_in">size</span>();<br>        <span class="hljs-keyword">if</span>(n == <span class="hljs-number">0</span> || C == <span class="hljs-number">0</span>)<br>            <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br><br>        <span class="hljs-function">vector&lt;<span class="hljs-type">int</span>&gt; <span class="hljs-title">memo</span><span class="hljs-params">(C + <span class="hljs-number">1</span>,<span class="hljs-number">0</span>)</span></span>;<br><br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j = <span class="hljs-number">0</span> ; j &lt;= C ; j ++)<br>            memo[j] = (j &gt;= w[<span class="hljs-number">0</span>] ? v[<span class="hljs-number">0</span>] : <span class="hljs-number">0</span> );<br><br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">1</span> ; i &lt; n ; i ++)<br>            <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j = C ; j &gt;= w[i] ; j --)&#123;<br>                memo[j] = <span class="hljs-built_in">max</span>(memo[j], v[i] + memo[j - w[i]]);<br>            &#125;<br>        <span class="hljs-keyword">return</span> memo[C];<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E9%9A%8F%E7%AC%94/" class="category-chain-item">随笔</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/algorithm/">#algorithm</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>01背包 递归→记忆化搜索→动态规划</div>
+      <div>https://tthres.github.io/2022/08/13/2022-8-13-01背包问题/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>水果挺甜</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年8月13日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/08/28/2022-8-27-%E5%9B%BE%E5%83%8F%E8%B4%A8%E9%87%8F%E8%AF%8A%E6%96%AD-%E9%9B%AA%E8%8A%B1-%E6%A8%A1%E7%B3%8A%E5%BA%A6%E8%AF%84%E4%BC%B0/" title="图像质量诊断：雪花噪声">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">图像质量诊断：雪花噪声</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/08/07/2022-8-7-C-%E6%A8%A1%E6%9D%BF/" title="泛型编程：C++">
+                        <span class="hidden-mobile">泛型编程：C++</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'tthres/tthres.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

@@ -1,0 +1,719 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar.png">
+  <link rel="icon" href="/img/avatar.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="水果挺甜">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="opencvcv::Matopencv的Mat类，使得opencv的编程更加的简单,我们能得到如下好处:1、不需要手动申请一块内存；2、不需要手动释放内存；3、通过类的封装能方便获取类的数据；  显然的，它利用了类的特性，将内存管理和数据信息封装在类的内部，用户只需要对Mat类对象进行数据或面向对象操作即可。Mat类分为两个部分：矩阵头和矩阵数据。如果我们在操作一副图像的数据量时，矩阵数据的大小很">
+<meta property="og:type" content="article">
+<meta property="og:title" content="图像质量诊断：雪花噪声">
+<meta property="og:url" content="https://tthres.github.io/2022/08/28/2022-8-27-%E5%9B%BE%E5%83%8F%E8%B4%A8%E9%87%8F%E8%AF%8A%E6%96%AD-%E9%9B%AA%E8%8A%B1-%E6%A8%A1%E7%B3%8A%E5%BA%A6%E8%AF%84%E4%BC%B0/index.html">
+<meta property="og:site_name" content="水果挺甜&#39;blog">
+<meta property="og:description" content="opencvcv::Matopencv的Mat类，使得opencv的编程更加的简单,我们能得到如下好处:1、不需要手动申请一块内存；2、不需要手动释放内存；3、通过类的封装能方便获取类的数据；  显然的，它利用了类的特性，将内存管理和数据信息封装在类的内部，用户只需要对Mat类对象进行数据或面向对象操作即可。Mat类分为两个部分：矩阵头和矩阵数据。如果我们在操作一副图像的数据量时，矩阵数据的大小很">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tthres.github.io/img/2022-8-27%E8%A7%86%E9%A2%91%E8%AF%8A%E6%96%AD/cat01.jpg">
+<meta property="og:image" content="https://tthres.github.io/img/2022-8-27%E8%A7%86%E9%A2%91%E8%AF%8A%E6%96%AD/cat02.jpg">
+<meta property="og:image" content="https://tthres.github.io/img/2022-8-27%E8%A7%86%E9%A2%91%E8%AF%8A%E6%96%AD/cat03.jpg">
+<meta property="og:image" content="https://tthres.github.io/img/2022-8-27%E8%A7%86%E9%A2%91%E8%AF%8A%E6%96%AD/cat04.jpg">
+<meta property="og:image" content="https://tthres.github.io/img/2022-8-27%E8%A7%86%E9%A2%91%E8%AF%8A%E6%96%AD/cat01_salt.jpg">
+<meta property="og:image" content="https://tthres.github.io/img/2022-8-27%E8%A7%86%E9%A2%91%E8%AF%8A%E6%96%AD/cat01_salt0.jpg">
+<meta property="og:image" content="https://tthres.github.io/img/2022-8-27%E8%A7%86%E9%A2%91%E8%AF%8A%E6%96%AD/cat01_salt1.jpg">
+<meta property="article:published_time" content="2022-08-27T22:01:26.000Z">
+<meta property="article:modified_time" content="2023-03-08T09:33:30.341Z">
+<meta property="article:author" content="水果挺甜">
+<meta property="article:tag" content="c++">
+<meta property="article:tag" content="视频质量诊断">
+<meta property="article:tag" content="opencv">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://tthres.github.io/img/2022-8-27%E8%A7%86%E9%A2%91%E8%AF%8A%E6%96%AD/cat01.jpg">
+  
+  
+  
+  <title>图像质量诊断：雪花噪声 - 水果挺甜&#39;blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"tthres.github.io","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>水果挺甜&#39;blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="图像质量诊断：雪花噪声"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-08-28 06:01" pubdate>
+          2022年8月28日 早上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4.3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          36 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">图像质量诊断：雪花噪声</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="opencv"><a href="#opencv" class="headerlink" title="opencv"></a>opencv</h1><h2 id="cv-Mat"><a href="#cv-Mat" class="headerlink" title="cv::Mat"></a>cv::Mat</h2><p>opencv的Mat类，使得opencv的编程更加的简单,我们能得到如下好处:<br>1、不需要手动申请一块内存；<br>2、不需要手动释放内存；<br>3、通过类的封装能方便获取类的数据；  <br/><br>显然的，它利用了类的特性，将内存管理和数据信息封装在类的内部，用户只需要对Mat类对象进行数据或面向对象操作即可。<br>Mat类分为两个部分：矩阵头和矩阵数据。如果我们在操作一副图像的数据量时，矩阵数据的大小很大（一般约有1M的数据量），那么拷贝和赋值函数所作的操作如果的深拷贝的话，效率会大大的降低。所以，Opencv的做法是只复制其矩阵头信息，而矩阵数据采用引用的方式，即多个Mat对象共享同一个矩阵数据，这里使用的原理类似c++11中的共享指针。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c++">cv::Mat A = cv::<span class="hljs-built_in">imread</span>(<span class="hljs-string">&quot;../opencv_test.jpg&quot;</span>);<br><span class="hljs-function">cv::Mat <span class="hljs-title">B</span><span class="hljs-params">(A)</span></span>;<br>cv::Mat C = A;<br><br><span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;A.data = %p\nB.data = %p\nC.data = %p\n&quot;</span>, A.data, B.data, C.data);<br></code></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs haskell"><span class="hljs-type">A</span>.<span class="hljs-class"><span class="hljs-keyword">data</span> = 0x7f2c1fac5040</span><br><span class="hljs-type">B</span>.<span class="hljs-class"><span class="hljs-keyword">data</span> = 0x7f2c1fac5040</span><br><span class="hljs-type">C</span>.<span class="hljs-class"><span class="hljs-keyword">data</span> = 0x7f2c1fac5040</span><br></code></pre></td></tr></table></figure>
+<p>三个Mat类对象的矩阵数据的地址是一样的。</p>
+<h2 id="cv-cvtColor"><a href="#cv-cvtColor" class="headerlink" title="cv::cvtColor()"></a>cv::cvtColor()</h2><p>用于将图像从一个颜色空间转换到另一个颜色空间的转换。</p>
+<h2 id="cv-blur"><a href="#cv-blur" class="headerlink" title="cv::blur()"></a>cv::blur()</h2><p>对输入的图像src进行均值滤波后用dst输出。</p>
+<h3 id="均值滤波"><a href="#均值滤波" class="headerlink" title="均值滤波"></a>均值滤波</h3><p>对目标像素及周边像素取平均值后再填回目标像素来实现滤波目的。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>	Mat imgOri = <span class="hljs-built_in">imread</span>(<span class="hljs-string">&quot;D:\\xxx.jpg&quot;</span>);<br>	<span class="hljs-built_in">namedWindow</span>(<span class="hljs-string">&quot;imgOri&quot;</span>);<br>	<span class="hljs-built_in">imshow</span>(<span class="hljs-string">&quot;imgOri&quot;</span>, imgOri);<br><br>	Mat imgOut, gray;<br>	<span class="hljs-built_in">cvtColor</span>(imgOri, gray, COLOR_BGR2GRAY);<br>	<span class="hljs-built_in">blur</span>(gray, imgOut, &#123; <span class="hljs-number">3</span>, <span class="hljs-number">3</span> &#125;);<br>	<span class="hljs-built_in">namedWindow</span>(<span class="hljs-string">&quot;imgOut&quot;</span>);<br>	<span class="hljs-built_in">imshow</span>(<span class="hljs-string">&quot;imgOut&quot;</span>, imgOut);<br><br>	<span class="hljs-built_in">waitKey</span>(<span class="hljs-number">0</span>);<br>	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p><img src="/img/2022-8-27%E8%A7%86%E9%A2%91%E8%AF%8A%E6%96%AD/cat01.jpg" srcset="/img/loading.gif" lazyload alt="图1"><br><img src="/img/2022-8-27%E8%A7%86%E9%A2%91%E8%AF%8A%E6%96%AD/cat02.jpg" srcset="/img/loading.gif" lazyload alt="图2"></p>
+<h2 id="cv-filter2D"><a href="#cv-filter2D" class="headerlink" title="cv::filter2D()"></a>cv::filter2D()</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">cv::filter2D</span><span class="hljs-params">(InputArray   src,</span></span><br><span class="hljs-params"><span class="hljs-function">                  OutputArray  dst,</span></span><br><span class="hljs-params"><span class="hljs-function">                  <span class="hljs-type">int</span>          ddepth,</span></span><br><span class="hljs-params"><span class="hljs-function">                  InputArray   kernel,</span></span><br><span class="hljs-params"><span class="hljs-function">                  Point        anchor=Point(<span class="hljs-number">-1</span>, <span class="hljs-number">-1</span>),</span></span><br><span class="hljs-params"><span class="hljs-function">                  <span class="hljs-type">double</span>       delta=<span class="hljs-number">0</span>,</span></span><br><span class="hljs-params"><span class="hljs-function">                  <span class="hljs-type">int</span>          borderType=BORDER_DEFAULT</span></span><br><span class="hljs-params"><span class="hljs-function">                  )</span></span><br></code></pre></td></tr></table></figure>
+<p>利用内核实现对图像的卷积运算，可用于自定义去噪。</p>
+<h2 id="cv-min"><a href="#cv-min" class="headerlink" title="cv::min()"></a>cv::min()</h2><p>获取两个矩阵对应元素的最小值。</p>
+<h2 id="Mat-forEach"><a href="#Mat-forEach" class="headerlink" title="Mat::forEach()"></a>Mat::forEach()</h2><p>遍历图像所有像素（并行处理）。</p>
+<h1 id="雪花噪声评估"><a href="#雪花噪声评估" class="headerlink" title="雪花噪声评估"></a>雪花噪声评估</h1><h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>雪花噪声又叫椒盐噪声也称为脉冲噪声，是图像中经常见到的一种噪声，它是一种随机出现的白点或者黑点，可能是亮的区域有黑色像素或是在暗的区域有白色像素（或是两者皆有）。椒盐噪声的成因可能是影像讯号受到突如其来的强烈干扰而产生、模数转换器或位元传输错误等。<br>图像随机添加雪花噪声：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">//椒盐噪声函数</span><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">saltAndPepper</span><span class="hljs-params">(Mat image, <span class="hljs-type">int</span> n)</span> </span>&#123;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> k = <span class="hljs-number">0</span>; k &lt; n; ++k) &#123;<br>        <span class="hljs-comment">//随机确定图像中位置</span><br>        <span class="hljs-type">int</span> i, j;<br>        i = <span class="hljs-built_in">rand</span>() % image.cols;                    <span class="hljs-comment">//取余数运算，保证在图像的列数内</span><br>        j = <span class="hljs-built_in">rand</span>() % image.rows;                    <span class="hljs-comment">//取余数运算，保证在图像的行数内</span><br>        <span class="hljs-type">int</span> write_black = <span class="hljs-built_in">rand</span>() % <span class="hljs-number">2</span>;               <span class="hljs-comment">//判定为白色噪声还是黑色噪声的变量</span><br>        <span class="hljs-keyword">if</span> (write_black == <span class="hljs-number">0</span>) &#123;                     <span class="hljs-comment">//添加白色噪声</span><br>            <span class="hljs-keyword">if</span> (image.<span class="hljs-built_in">type</span>() == CV_8UC1) &#123;          <span class="hljs-comment">//处理灰度图像</span><br>                image.<span class="hljs-built_in">at</span>&lt;uchar&gt;(j, i) = <span class="hljs-number">255</span>;        <span class="hljs-comment">//白色噪声</span><br>            &#125;<br>            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (image.<span class="hljs-built_in">type</span>() == CV_8UC3) &#123;     <span class="hljs-comment">//处理彩色图像</span><br>                image.<span class="hljs-built_in">at</span>&lt;Vec3b&gt;(j, i)[<span class="hljs-number">0</span>] = <span class="hljs-number">255</span>;     <span class="hljs-comment">//Vec3b为opencv定义的3个值的向量类型</span><br>                image.<span class="hljs-built_in">at</span>&lt;Vec3b&gt;(j, i)[<span class="hljs-number">1</span>] = <span class="hljs-number">255</span>;     <span class="hljs-comment">//[]制定通道，B:0,G:1,R:2</span><br>                image.<span class="hljs-built_in">at</span>&lt;Vec3b&gt;(j, i)[<span class="hljs-number">2</span>] = <span class="hljs-number">255</span>;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">else</span> &#123;                                      <span class="hljs-comment">//添加黑噪声</span><br>            <span class="hljs-keyword">if</span> (image.<span class="hljs-built_in">type</span>() == CV_8UC1) &#123;<br>                image.<span class="hljs-built_in">at</span>&lt;uchar&gt;(j, i) = <span class="hljs-number">0</span>;<br>            &#125;<br>            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (image.<span class="hljs-built_in">type</span>() == CV_8UC3) &#123;<br>                image.<span class="hljs-built_in">at</span>&lt;Vec3b&gt;(j, i)[<span class="hljs-number">0</span>] = <span class="hljs-number">0</span>;       <span class="hljs-comment">//Vec3b为opencv定义的3个值的向量类型</span><br>                image.<span class="hljs-built_in">at</span>&lt;Vec3b&gt;(j, i)[<span class="hljs-number">1</span>] = <span class="hljs-number">0</span>;       <span class="hljs-comment">//[]制定通道，B:0,G:1,R:2</span><br>                image.<span class="hljs-built_in">at</span>&lt;Vec3b&gt;(j, i)[<span class="hljs-number">2</span>] = <span class="hljs-number">0</span>;<br>            &#125;<br>        &#125;<br>    &#125;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>&#123;<br>    Mat img_ = <span class="hljs-built_in">imread</span>(<span class="hljs-string">&quot;D:\\0001\\cat01.jpg&quot;</span>);<br>    Mat img;<br>    <span class="hljs-built_in">resize</span>(img_, img, <span class="hljs-built_in">Size</span>(img_.cols, img_.rows));<br>    Mat gray;<br>    <span class="hljs-built_in">cvtColor</span>(img, gray, COLOR_BGR2GRAY);<br>    <span class="hljs-keyword">if</span> (img.<span class="hljs-built_in">empty</span>() || gray.<span class="hljs-built_in">empty</span>()) &#123;<br>        cout &lt;&lt; <span class="hljs-string">&quot;请确认输入的路径是否正确&quot;</span> &lt;&lt; endl;<br>        <span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;<br>    &#125;<br><br>    <span class="hljs-built_in">imshow</span>(<span class="hljs-string">&quot;cat原图&quot;</span>, img);<br>    <span class="hljs-built_in">imshow</span>(<span class="hljs-string">&quot;cat_gray原图&quot;</span>, gray);<br>    <span class="hljs-built_in">saltAndPepper</span>(img, <span class="hljs-number">10000</span>);                      <span class="hljs-comment">//彩色图像添加椒盐噪声</span><br>    <span class="hljs-built_in">saltAndPepper</span>(gray, <span class="hljs-number">10000</span>);                     <span class="hljs-comment">//灰度图像添加椒盐噪声</span><br>    <span class="hljs-built_in">imshow</span>(<span class="hljs-string">&quot;cat添加噪声&quot;</span>, img);<br>    <span class="hljs-built_in">imshow</span>(<span class="hljs-string">&quot;cat_gray添加噪声&quot;</span>, gray);<br>    <span class="hljs-built_in">waitKey</span>(<span class="hljs-number">0</span>);<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p><img src="/img/2022-8-27%E8%A7%86%E9%A2%91%E8%AF%8A%E6%96%AD/cat03.jpg" srcset="/img/loading.gif" lazyload alt="图3"><br><img src="/img/2022-8-27%E8%A7%86%E9%A2%91%E8%AF%8A%E6%96%AD/cat04.jpg" srcset="/img/loading.gif" lazyload alt="图4"></p>
+<p>当图片中的像素同时满足以下两个条件可以判定为噪点：<br>1、进行中值滤波，然后与原图进行比较，差距较大；<br>2、像素与周围像素的差距是否都很大：通过四个方向的卷积取最小值来比较。  </p>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>定义卷积运算的卷积核</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c++">std::vector&lt;cv::Mat&gt; kernels = &#123;<br>            cv::<span class="hljs-built_in">Mat</span>(&#123;<span class="hljs-number">3</span>, <span class="hljs-number">3</span>&#125;, &#123;<span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">-2.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>&#125;),<br>            cv::<span class="hljs-built_in">Mat</span>(&#123;<span class="hljs-number">3</span>, <span class="hljs-number">3</span>&#125;, &#123;<span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">-2.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>, <span class="hljs-number">0.0</span>&#125;),<br>            cv::<span class="hljs-built_in">Mat</span>(&#123;<span class="hljs-number">3</span>, <span class="hljs-number">3</span>&#125;, &#123;<span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>, <span class="hljs-number">-2.0</span>, <span class="hljs-number">1.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>&#125;),<br>            cv::<span class="hljs-built_in">Mat</span>(&#123;<span class="hljs-number">3</span>, <span class="hljs-number">3</span>&#125;, &#123;<span class="hljs-number">1.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">-2.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>&#125;),<br>    &#125;;<br></code></pre></td></tr></table></figure>
+<p>将图片灰度化后进行均值滤波，取与原图像差的绝对值；再对灰度化的图片进行卷积运算，取四个方向与原图片差值的绝对值的最小值。将获得的这两个数与自己的设定的阈值作比较就是雪花噪声的像素点，最后所有的像素点占整幅图像的比例就是雪花噪声率。</p>
+<h2 id="部分代码"><a href="#部分代码" class="headerlink" title="部分代码"></a>部分代码</h2><p>conv_thr和filter_thr为卷积差异阈值和中值滤波差异阈值。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs c++">cv::Mat gray;<br>cv::<span class="hljs-built_in">cvtColor</span>(image, gray, cv::COLOR_BGR2GRAY);<br><br>std::vector&lt;cv::Mat&gt; kernels = &#123;<br>        cv::<span class="hljs-built_in">Mat</span>(&#123;<span class="hljs-number">3</span>, <span class="hljs-number">3</span>&#125;, &#123;<span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">-2.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>&#125;),<br>        cv::<span class="hljs-built_in">Mat</span>(&#123;<span class="hljs-number">3</span>, <span class="hljs-number">3</span>&#125;, &#123;<span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">-2.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>, <span class="hljs-number">0.0</span>&#125;),<br>        cv::<span class="hljs-built_in">Mat</span>(&#123;<span class="hljs-number">3</span>, <span class="hljs-number">3</span>&#125;, &#123;<span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>, <span class="hljs-number">-2.0</span>, <span class="hljs-number">1.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>&#125;),<br>        cv::<span class="hljs-built_in">Mat</span>(&#123;<span class="hljs-number">3</span>, <span class="hljs-number">3</span>&#125;, &#123;<span class="hljs-number">1.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">-2.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>&#125;),<br>&#125;;<br><br><span class="hljs-comment">/* 中值滤波 */</span><br>cv::Mat median;<br>cv::<span class="hljs-built_in">medianBlur</span>(gray, median, <span class="hljs-number">5</span>);<br>cv::Mat diff = cv::<span class="hljs-built_in">abs</span>(median - gray);<br><br>cv::Mat tmp, min = gray.<span class="hljs-built_in">clone</span>();<br>min = <span class="hljs-number">255</span>;<br><span class="hljs-keyword">for</span> (<span class="hljs-type">const</span> <span class="hljs-keyword">auto</span> &amp;kernel : kernels) &#123;<br>    cv::<span class="hljs-built_in">filter2D</span>(gray, tmp, <span class="hljs-number">-1</span>, kernel);<br>    cv::<span class="hljs-built_in">min</span>(min, cv::<span class="hljs-built_in">abs</span>(tmp), min);<br>&#125;<br><br>min.forEach&lt;<span class="hljs-type">uint8_t</span>&gt;([&amp;](<span class="hljs-type">uint8_t</span> &amp;pixel, <span class="hljs-type">const</span> <span class="hljs-type">int</span> *position) &#123;<br>    <span class="hljs-type">uint8_t</span> p = diff.<span class="hljs-built_in">at</span>&lt;<span class="hljs-type">uint8_t</span>&gt;(position[<span class="hljs-number">0</span>], position[<span class="hljs-number">1</span>]);<br>    <span class="hljs-keyword">if</span> (pixel &gt; conv_thr &amp;&amp; p &gt; filter_thr) &#123;<br>        count++;<br>    &#125;<br>&#125;);<br><br><span class="hljs-keyword">return</span> (<span class="hljs-type">float</span>) count / (<span class="hljs-type">float</span>) image.<span class="hljs-built_in">total</span>();<br></code></pre></td></tr></table></figure>
+<p><img src="/img/2022-8-27%E8%A7%86%E9%A2%91%E8%AF%8A%E6%96%AD/cat01_salt.jpg" srcset="/img/loading.gif" lazyload alt="雪花占比0.021147"><br><img src="/img/2022-8-27%E8%A7%86%E9%A2%91%E8%AF%8A%E6%96%AD/cat01_salt0.jpg" srcset="/img/loading.gif" lazyload alt="雪花占比0.042087"><br><img src="/img/2022-8-27%E8%A7%86%E9%A2%91%E8%AF%8A%E6%96%AD/cat01_salt1.jpg" srcset="/img/loading.gif" lazyload alt="雪花占比0.131752"></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E9%9A%8F%E7%AC%94/" class="category-chain-item">随笔</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/c/">#c++</a>
+      
+        <a href="/tags/%E8%A7%86%E9%A2%91%E8%B4%A8%E9%87%8F%E8%AF%8A%E6%96%AD/">#视频质量诊断</a>
+      
+        <a href="/tags/opencv/">#opencv</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>图像质量诊断：雪花噪声</div>
+      <div>https://tthres.github.io/2022/08/28/2022-8-27-图像质量诊断-雪花-模糊度评估/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>水果挺甜</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年8月28日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/08/28/2022-8-28-cout%E5%92%8Cprintf%E7%9A%84%E7%AC%94%E8%AE%B0/" title="cout和printf的笔记">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">cout和printf的笔记</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/08/13/2022-8-13-01%E8%83%8C%E5%8C%85%E9%97%AE%E9%A2%98/" title="01背包 递归→记忆化搜索→动态规划">
+                        <span class="hidden-mobile">01背包 递归→记忆化搜索→动态规划</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'tthres/tthres.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

@@ -1,0 +1,726 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar.png">
+  <link rel="icon" href="/img/avatar.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="水果挺甜">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="C++红黑树简易实现 红黑树是一种二叉搜索树，但在每个结点上增加了一个存储位用于表示结点的颜色，这个颜色可以是红色的，也可以是黑色的，因此我们称之为红黑树。 一、红黑树满足的条件 1、每个节点非黑即红 2、根节点必黑 3、叶节点（NIL）必黑 4、红节点的两个子节点必黑 5、从根节点出发到所有叶节点路径上，黑色节点数量相同 对于红黑树结构简单定义的代码如下： 12345678struct Tree">
+<meta property="og:type" content="article">
+<meta property="og:title" content="红黑树：C++">
+<meta property="og:url" content="https://tthres.github.io/2022/03/30/2022-03-29-c-%E7%BA%A2%E9%BB%91%E6%A0%91%E7%9A%84%E5%AE%9E%E7%8E%B0/index.html">
+<meta property="og:site_name" content="水果挺甜&#39;blog">
+<meta property="og:description" content="C++红黑树简易实现 红黑树是一种二叉搜索树，但在每个结点上增加了一个存储位用于表示结点的颜色，这个颜色可以是红色的，也可以是黑色的，因此我们称之为红黑树。 一、红黑树满足的条件 1、每个节点非黑即红 2、根节点必黑 3、叶节点（NIL）必黑 4、红节点的两个子节点必黑 5、从根节点出发到所有叶节点路径上，黑色节点数量相同 对于红黑树结构简单定义的代码如下： 12345678struct Tree">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tthres.github.io/img/C++%E7%BA%A2%E9%BB%91%E6%A0%91/1.png">
+<meta property="og:image" content="https://tthres.github.io/img/C++%E7%BA%A2%E9%BB%91%E6%A0%91/1.png">
+<meta property="og:image" content="https://tthres.github.io/img/C++%E7%BA%A2%E9%BB%91%E6%A0%91/2.png">
+<meta property="og:image" content="https://tthres.github.io/img/C++%E7%BA%A2%E9%BB%91%E6%A0%91/3.png">
+<meta property="og:image" content="https://tthres.github.io/img/C++%E7%BA%A2%E9%BB%91%E6%A0%91/4.png">
+<meta property="og:image" content="https://tthres.github.io/img/C++%E7%BA%A2%E9%BB%91%E6%A0%91/5.png">
+<meta property="og:image" content="https://tthres.github.io/img/C++%E7%BA%A2%E9%BB%91%E6%A0%91/6.png">
+<meta property="og:image" content="https://tthres.github.io/img/C++%E7%BA%A2%E9%BB%91%E6%A0%91/7.png">
+<meta property="og:image" content="https://tthres.github.io/img/C++%E7%BA%A2%E9%BB%91%E6%A0%91/7.png">
+<meta property="og:image" content="https://tthres.github.io/img/C++%E7%BA%A2%E9%BB%91%E6%A0%91/8.png">
+<meta property="og:image" content="https://tthres.github.io/img/C++%E7%BA%A2%E9%BB%91%E6%A0%91/9.png">
+<meta property="og:image" content="https://tthres.github.io/img/C++%E7%BA%A2%E9%BB%91%E6%A0%91/10.png">
+<meta property="og:image" content="https://tthres.github.io/img/C++%E7%BA%A2%E9%BB%91%E6%A0%91/11.png">
+<meta property="og:image" content="https://tthres.github.io/img/C++%E7%BA%A2%E9%BB%91%E6%A0%91/12.png">
+<meta property="og:image" content="https://tthres.github.io/img/C++%E7%BA%A2%E9%BB%91%E6%A0%91/13.png">
+<meta property="article:published_time" content="2022-03-29T20:29:55.000Z">
+<meta property="article:modified_time" content="2023-03-08T09:33:30.341Z">
+<meta property="article:author" content="水果挺甜">
+<meta property="article:tag" content="c++">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://tthres.github.io/img/C++%E7%BA%A2%E9%BB%91%E6%A0%91/1.png">
+  
+  
+  
+  <title>红黑树：C++ - 水果挺甜&#39;blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"tthres.github.io","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>水果挺甜&#39;blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="红黑树：C++"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-03-30 04:29" pubdate>
+          2022年3月30日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          7.2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          60 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">红黑树：C++</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="C-红黑树简易实现"><a href="#C-红黑树简易实现" class="headerlink" title="C++红黑树简易实现"></a>C++红黑树简易实现</h1><p> 红黑树是一种二叉搜索树，但在每个结点上增加了一个存储位用于表示结点的颜色，这个颜色可以是红色的，也可以是黑色的，因此我们称之为红黑树。</p>
+<h2 id="一、红黑树满足的条件"><a href="#一、红黑树满足的条件" class="headerlink" title="一、红黑树满足的条件"></a>一、红黑树满足的条件</h2><p> 1、每个节点非黑即红<br><br> 2、根节点必黑<br><br> 3、叶节点（NIL）必黑<br><br> 4、红节点的两个子节点必黑<br><br> 5、从根节点出发到所有叶节点路径上，黑色节点数量相同<br></p>
+<p>对于红黑树结构简单定义的代码如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">struct</span> <span class="hljs-title class_">TreeNode</span> &#123;<br>    <span class="hljs-type">int</span> key;<br>    <span class="hljs-type">int</span> color; <span class="hljs-comment">// 0 red; 1 black; 2 double black</span><br>    TreeNode *left;<br>    TreeNode *right;<br>    <span class="hljs-built_in">TreeNode</span>(<span class="hljs-type">int</span> x) : <span class="hljs-built_in">key</span>(x), <span class="hljs-built_in">left</span>(<span class="hljs-literal">NULL</span>), <span class="hljs-built_in">right</span>(<span class="hljs-literal">NULL</span>) &#123;&#125;<br>    <span class="hljs-built_in">TreeNode</span>() &#123;&#125;<br>&#125;;<span class="hljs-comment">// 这里的double black颜色是用来方便删除调整的</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="二、红黑树的插入和删除策略"><a href="#二、红黑树的插入和删除策略" class="headerlink" title="二、红黑树的插入和删除策略"></a>二、红黑树的插入和删除策略</h2><p> 红黑树的插入和删除策略可以参考平衡二叉搜索树的插入和删除。</p>
+<h2 id="三、红黑树的调整策略"><a href="#三、红黑树的调整策略" class="headerlink" title="三、红黑树的调整策略"></a>三、红黑树的调整策略</h2><p> 调整策略分为插入调整和删除调整，其中插入调整可分为两大情况，删除调整可分为三大情况，下面介绍这五种情况。</p>
+<h3 id="①插入调整"><a href="#①插入调整" class="headerlink" title="①插入调整"></a><font color=red>①插入调整</font></h3><p> 1、为了满足条件5（从根节点出发到所有叶节点路径上，黑色节点数量相同）插入的节点应该都为红节点。</p>
+<p> 2、若插入后出现连着两个红色，此时不满足条件4（红节点的两个子节点必黑），应进行插入调整。</p>
+<h4 id="插入调整应站在祖父节点的角度"><a href="#插入调整应站在祖父节点的角度" class="headerlink" title="插入调整应站在祖父节点的角度"></a>插入调整应站在祖父节点的角度</h4><p><img src="/img/C++%E7%BA%A2%E9%BB%91%E6%A0%91/1.png" srcset="/img/loading.gif" lazyload alt="1"></p>
+<p>如上图节点“6”和“8”发生冲突，需站在“5”节点向下看。<font color=red>即当我们在父节点发现自己与子节点发生冲突，此时不用进行调整。</font></p>
+<h4 id="情况1："><a href="#情况1：" class="headerlink" title="情况1："></a><font color=green>情况1：</font></h4><p><img src="/img/C++%E7%BA%A2%E9%BB%91%E6%A0%91/1.png" srcset="/img/loading.gif" lazyload alt="1"></p>
+<p> 根节点的两个子节点为红，其中一个子节点的一个子节点也为红。冲突！</p>
+<p>调整方法：将根节点与它的两子节点改变颜色，从原来的黑、红、红，改为红、黑、黑<br><img src="/img/C++%E7%BA%A2%E9%BB%91%E6%A0%91/2.png" srcset="/img/loading.gif" lazyload alt="2"></p>
+<p>调整完后可以看到仍然满足<font color=bulue>从根节点出发到所有叶节点路径上，黑色节点数量相同。</font></p>
+<h4 id="情况2："><a href="#情况2：" class="headerlink" title="情况2："></a><font color=green>情况2：</font></h4><p><img src="/img/C++%E7%BA%A2%E9%BB%91%E6%A0%91/3.png" srcset="/img/loading.gif" lazyload alt="3"></p>
+<p> 根节点的两个子节点一黑一红，红色子节点的一个子节点也为红。冲突！</p>
+<p>冲突的两个红节点都在根节点的左边，这种情况我们称为“LL”类型的冲突。</p>
+<p>调整方法：抓住根节点进行一个大右旋<br><img src="/img/C++%E7%BA%A2%E9%BB%91%E6%A0%91/4.png" srcset="/img/loading.gif" lazyload alt="4"></p>
+<p>右旋后就是调整颜色了，直接修改新根节点和其两个子节点的颜色即可，可以采用：红色上浮、红色下潜。<br><img src="/img/C++%E7%BA%A2%E9%BB%91%E6%A0%91/5.png" srcset="/img/loading.gif" lazyload alt="5"><br><img src="/img/C++%E7%BA%A2%E9%BB%91%E6%A0%91/6.png" srcset="/img/loading.gif" lazyload alt="6"></p>
+<p>调整后仍然满足红黑树的定义。两种方法都可使用。</p>
+<p> 如果冲突的两个红节点是“LR”类型，即第一个红节点在根节点左边，第二个红节点在第一个红节点的右边。我们可以抓住第一个在根节点左边的红节点进行小左旋，此时即转化为“LL”类型冲突。</p>
+<p> 同理，“RR”类型的冲突我们可以仿照“LL”类型的冲突，先抓住根节点进行大左旋，再调整颜色即可。而“RL”类型与“LR”类型同理，进行一个小右旋即可转化为“RR”类型。</p>
+<h3 id="②删除调整"><a href="#②删除调整" class="headerlink" title="②删除调整"></a><font color=red>②删除调整</font></h3><h4 id="删除调整的注意事项："><a href="#删除调整的注意事项：" class="headerlink" title="删除调整的注意事项："></a>删除调整的注意事项：</h4><p> 1、删除红色节点对树没影响。<br><br> 2、度为1的黑色节点，若有唯一子节点，一定是红色。<br><br> 3、删除度为1的黑色节点，不会产生删除调整（删完后让他子节点变黑就行）。<br><br> 4、删除度为0的黑色节点，会产生一个双重黑的NIL节点（为了满足调整前后，从根节点出发到所有叶节点路径上，黑色节点数量相同）。<br><br> 5、删除调整，就是为了干掉双重黑。<br><br> 6、删除度为2的节点可以转化为度为0或1的节点。（参考平衡二叉搜索树）<br></p>
+<h4 id="删除调整要站在双重黑节点的父节点的角度向下进行调整。"><a href="#删除调整要站在双重黑节点的父节点的角度向下进行调整。" class="headerlink" title="删除调整要站在双重黑节点的父节点的角度向下进行调整。"></a>删除调整要站在双重黑节点的父节点的角度向下进行调整。</h4><p> 如下图，我们将双重黑的节点用一个四角形标记。<br><img src="/img/C++%E7%BA%A2%E9%BB%91%E6%A0%91/7.png" srcset="/img/loading.gif" lazyload alt="7"></p>
+<p> 在进行调整时，要站在“43”节点的位置进行调整。</p>
+<h4 id="情况1：-1"><a href="#情况1：-1" class="headerlink" title="情况1："></a><font color=green>情况1：</font></h4><p><img src="/img/C++%E7%BA%A2%E9%BB%91%E6%A0%91/7.png" srcset="/img/loading.gif" lazyload alt="7"></p>
+<p>双重黑节点的兄弟节点是黑色，兄弟节点下面的两个子节点也是黑色。</p>
+<p>调整方法：父节点增加一重黑色，父节点的两个子节点（双重黑与兄弟节点）都减一层黑色。<br><img src="/img/C++%E7%BA%A2%E9%BB%91%E6%A0%91/8.png" srcset="/img/loading.gif" lazyload alt="8"></p>
+<h4 id="情况2：-1"><a href="#情况2：-1" class="headerlink" title="情况2："></a><font color=green>情况2：</font></h4><p>双重黑节点的兄弟节点是黑色，但兄弟节点下面有红色子节点。<br><img src="/img/C++%E7%BA%A2%E9%BB%91%E6%A0%91/9.png" srcset="/img/loading.gif" lazyload alt="9"></p>
+<p>如上图，兄弟节点在右边，且兄弟节点的右子节点为红色，定义为“RR”类型冲突。注意：只要右子节点为红色，都是“RR”类型，只有左子节点单独为红是才是“RL”类型。</p>
+<p>调整方法：“RR”类型抓住根节点左旋，将新根改为原根的颜色，再将新根的两个子节点改成黑色。“LL”类型同理，抓住根节点右旋。。。<br><img src="/img/C++%E7%BA%A2%E9%BB%91%E6%A0%91/10.png" srcset="/img/loading.gif" lazyload alt="10"></p>
+<p>如果是“RL”类型，只需抓住兄弟节点进行小右旋，交换新根节点与原根节点的颜色，即可转换为“RR”类型。同理“LR”类型只需抓住兄弟节点进行小左旋，交换新根节点与原根节点的颜色，即可转换为“LL”类型。<br><img src="/img/C++%E7%BA%A2%E9%BB%91%E6%A0%91/11.png" srcset="/img/loading.gif" lazyload alt="11"></p>
+<h4 id="情况3："><a href="#情况3：" class="headerlink" title="情况3："></a><font color=green>情况3：</font></h4><p>双重黑的兄弟节点是红色。<br><img src="/img/C++%E7%BA%A2%E9%BB%91%E6%A0%91/12.png" srcset="/img/loading.gif" lazyload alt="12"></p>
+<p>调整方法：通过旋转将红色节点转到根节点，再将此时的根节点变黑，原来的根节点变红，这样兄弟节点就变黑了，就能转变为上面的两种情况。<br><img src="/img/C++%E7%BA%A2%E9%BB%91%E6%A0%91/13.png" srcset="/img/loading.gif" lazyload alt="13"></p>
+<h2 id="红黑树简单实现代码"><a href="#红黑树简单实现代码" class="headerlink" title="红黑树简单实现代码"></a>红黑树简单实现代码</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">struct</span> <span class="hljs-title class_">TreeNode</span> &#123;<br>    <span class="hljs-type">int</span> key;<br>    <span class="hljs-type">int</span> color; <span class="hljs-comment">// 0 red; 1 black; 2 double black</span><br>    TreeNode *left;<br>    TreeNode *right;<br>    <span class="hljs-built_in">TreeNode</span>(<span class="hljs-type">int</span> x) : <span class="hljs-built_in">key</span>(x), <span class="hljs-built_in">left</span>(<span class="hljs-literal">NULL</span>), <span class="hljs-built_in">right</span>(<span class="hljs-literal">NULL</span>) &#123;&#125;<br>    <span class="hljs-built_in">TreeNode</span>() &#123;&#125;<br>&#125;;<br><br><span class="hljs-comment">// 虚拟空节点</span><br>TreeNode __NIL;<br><span class="hljs-meta">#<span class="hljs-keyword">define</span> NIL (&amp;__NIL)</span><br>__attribute__((constructor))<br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">init_NIL</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    NIL-&gt;key = <span class="hljs-number">0</span>;<br>    NIL-&gt;color = <span class="hljs-number">1</span>;<br>    NIL-&gt;left = NIL-&gt;right = NIL;<br>    <span class="hljs-keyword">return</span> ;<br>&#125;<br><br><span class="hljs-comment">// 创建一个等待插入的红节点</span><br><span class="hljs-function">TreeNode *<span class="hljs-title">getNewNode</span><span class="hljs-params">(<span class="hljs-type">int</span> key)</span></span><br><span class="hljs-function"></span>&#123;<br>    TreeNode *node = <span class="hljs-keyword">new</span> <span class="hljs-built_in">TreeNode</span>(key);<br>    node-&gt;color = <span class="hljs-number">0</span>;<br>    node-&gt;left = node-&gt;right = NIL;<br>    <span class="hljs-keyword">return</span> node;<br>&#125;<br><br><span class="hljs-comment">// 找到树中某个节点的前驱</span><br><span class="hljs-function">TreeNode *<span class="hljs-title">predecessor</span><span class="hljs-params">(TreeNode *root)</span></span><br><span class="hljs-function"></span>&#123;<br>    TreeNode *temp = root-&gt;left;<br>    <span class="hljs-keyword">while</span> (temp-&gt;right != NIL) temp = temp-&gt;right;<br>    <span class="hljs-keyword">return</span> temp;<br>&#125;<br><br><br><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">clear</span><span class="hljs-params">(TreeNode *root)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">if</span> (root == NIL) <span class="hljs-keyword">return</span>;<br>    <span class="hljs-built_in">clear</span>(root-&gt;left);<br>    <span class="hljs-built_in">clear</span>(root-&gt;right);<br>    <span class="hljs-built_in">free</span>(root);<br>    <span class="hljs-keyword">return</span>;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">has_red_child</span><span class="hljs-params">(TreeNode *root)</span> </span>&#123; <span class="hljs-keyword">return</span> root-&gt;right-&gt;color == <span class="hljs-number">0</span> || root-&gt;left-&gt;color == <span class="hljs-number">0</span>; &#125;<br><br><span class="hljs-comment">// 左旋</span><br><span class="hljs-function">TreeNode *<span class="hljs-title">left_rotate</span><span class="hljs-params">(TreeNode *root)</span></span><br><span class="hljs-function"></span>&#123;<br>    TreeNode *temp = root-&gt;right;<br>    root-&gt;right = temp-&gt;left;<br>    temp-&gt;left = root;<br>    <span class="hljs-keyword">return</span> temp;<br>&#125;<br><span class="hljs-function">TreeNode *<span class="hljs-title">right_rotate</span><span class="hljs-params">(TreeNode *root)</span></span><br><span class="hljs-function"></span>&#123;<br>    TreeNode *temp = root-&gt;left;<br>    root-&gt;left = temp-&gt;right;<br>    temp-&gt;right = root;<br>    <span class="hljs-keyword">return</span> temp;<br>&#125;<br><br><span class="hljs-comment">// 删除调整函数</span><br><span class="hljs-function">TreeNode *<span class="hljs-title">erase_maintain</span><span class="hljs-params">(TreeNode *root)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">if</span> (root-&gt;left-&gt;color != <span class="hljs-number">2</span> &amp;&amp; root-&gt;right-&gt;color != <span class="hljs-number">2</span>) <span class="hljs-keyword">return</span> root;<br>    <span class="hljs-comment">// 找到双重黑节点了</span><br>    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">has_red_child</span>(root)) <span class="hljs-comment">// 兄弟节点是红色情况</span><br>    &#123;<br>        <span class="hljs-type">int</span> flag = <span class="hljs-number">0</span>;<br>        root-&gt;color = <span class="hljs-number">0</span>; <span class="hljs-comment">// 原根节点改红色</span><br>        <span class="hljs-keyword">if</span> (root-&gt;left-&gt;color == <span class="hljs-number">0</span>)<br>        &#123;<br>            root = <span class="hljs-built_in">right_rotate</span>(root); flag = <span class="hljs-number">1</span>; <span class="hljs-comment">//右旋，应向右递归</span><br>        &#125;<br>        <span class="hljs-keyword">else</span> <br>        &#123;<br>            root = <span class="hljs-built_in">left_rotate</span>(root); flag = <span class="hljs-number">2</span>; <span class="hljs-comment">// 左旋，向左递归</span><br>        &#125;<br>        root-&gt;color = <span class="hljs-number">1</span>; <span class="hljs-comment">// 新根节点改黑色</span><br>        <span class="hljs-keyword">if</span> (flag == <span class="hljs-number">1</span>) root-&gt;right = <span class="hljs-built_in">erase_maintain</span>(root-&gt;right);<br>        <span class="hljs-keyword">else</span> root-&gt;left = <span class="hljs-built_in">erase_maintain</span>(root-&gt;left);<br>        <span class="hljs-keyword">return</span> root;<br>    &#125;<br>    <span class="hljs-comment">// 兄弟节点是黑色的情况</span><br>    <br>    <span class="hljs-comment">// 情况一，兄弟节点的两个子节点都是黑色</span><br>    <span class="hljs-keyword">if</span> ((root-&gt;left-&gt;color == <span class="hljs-number">2</span> &amp;&amp; !<span class="hljs-built_in">has_red_child</span>(root-&gt;right)) ||<br>        (root-&gt;right-&gt;color == <span class="hljs-number">2</span> &amp;&amp; !<span class="hljs-built_in">has_red_child</span>(root-&gt;left)))<br>    &#123;<br>        root-&gt;left-&gt;color -= <span class="hljs-number">1</span>;<br>        root-&gt;right-&gt;color -= <span class="hljs-number">1</span>;<br>        root-&gt;color += <span class="hljs-number">1</span>;<br>        <span class="hljs-keyword">return</span> root;<br>    &#125;<br>    <span class="hljs-keyword">if</span> (root-&gt;left-&gt;color == <span class="hljs-number">2</span>) <span class="hljs-comment">// 左子树是双重黑</span><br>    &#123;<br>        <span class="hljs-keyword">if</span> (root-&gt;right-&gt;right-&gt;color != <span class="hljs-number">0</span>) <span class="hljs-comment">// 此时就是的RL类型</span><br>        &#123;<br>          root-&gt;right-&gt;color = <span class="hljs-number">0</span>;<br>          root = <span class="hljs-built_in">right_rotate</span>(root-&gt;right); <span class="hljs-comment">// 小右旋</span><br>          root-&gt;right-&gt;color = <span class="hljs-number">1</span>;<br>        &#125;<br>        root = <span class="hljs-built_in">left_rotate</span>(root);<br>        root-&gt;color = root-&gt;left-&gt;color;<br>    &#125;<br>    <span class="hljs-keyword">else</span> <span class="hljs-comment">// 右子树是双重黑</span><br>    &#123;<br>        <span class="hljs-keyword">if</span> (root-&gt;left-&gt;left-&gt;color != <span class="hljs-number">0</span>) <span class="hljs-comment">// 此时就是LR类型</span><br>        &#123;<br>          root-&gt;left-&gt;color = <span class="hljs-number">0</span>;<br>          root = <span class="hljs-built_in">left_rotate</span>(root-&gt;left); <span class="hljs-comment">// 小左旋</span><br>          root-&gt;left-&gt;color = <span class="hljs-number">1</span>;<br>        &#125;<br>        root = <span class="hljs-built_in">right_rotate</span>(root);<br>        root-&gt;color = root-&gt;right-&gt;color;<br>    &#125;<br>    root-&gt;left-&gt;color = root-&gt;right-&gt;color = <span class="hljs-number">1</span>;<br>    <span class="hljs-keyword">return</span> root;<br>    <br><br>&#125;<br><br>TreeNode *__erase(TreeNode *root, <span class="hljs-type">int</span> key)<br>&#123;<br>    <span class="hljs-keyword">if</span> (root == NIL) <span class="hljs-keyword">return</span> NIL; <span class="hljs-comment">// 说明当前树没有要删除的节点</span><br>    <span class="hljs-keyword">if</span> (key &lt; root-&gt;key) root-&gt;left = __erase(root-&gt;left, key);<br>    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (key &gt; root-&gt;key) root-&gt;right = __erase(root-&gt;right, key);<br>    <span class="hljs-comment">// 找到了</span><br>    <span class="hljs-keyword">else</span><br>    &#123;<br>        <span class="hljs-comment">// 度为1或0的情况</span><br>        <span class="hljs-keyword">if</span> (root-&gt;left == NIL || root-&gt;right == NIL)<br>        &#123;<br>            TreeNode *node = root-&gt;left != NIL ? root-&gt;left : root-&gt;right;<br>            node-&gt;color += root-&gt;color; <span class="hljs-comment">// 将当前节点的颜色加到子节点中去</span><br>            <span class="hljs-built_in">free</span>(root);<br>            <span class="hljs-keyword">return</span> node;<br>        &#125;<br>        <span class="hljs-keyword">else</span> <span class="hljs-comment">// 删除度为2的节点的情况</span><br>        &#123;<br>            TreeNode *temp = <span class="hljs-built_in">predecessor</span>(root); <span class="hljs-comment">// 找到它的前驱</span><br>            root-&gt;key = temp-&gt;key;<br>            root-&gt;left = __erase(root-&gt;left, temp-&gt;key); <span class="hljs-comment">// 到左子树中删除值为temp-&gt;key的节点</span><br>        &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">erase_maintain</span>(root);<br>&#125;<br><br><span class="hljs-function">TreeNode *<span class="hljs-title">erase</span><span class="hljs-params">(TreeNode *root, <span class="hljs-type">int</span> key)</span></span><br><span class="hljs-function"></span>&#123;<br>    root = __erase(root, key);<br>    root-&gt;color = <span class="hljs-number">1</span>; <span class="hljs-comment">//强制将root的颜色改为黑色</span><br>    <span class="hljs-keyword">return</span> root;<br>&#125;<br><br><span class="hljs-comment">// 插入调整</span><br><span class="hljs-function">TreeNode *<span class="hljs-title">insert_maintain</span><span class="hljs-params">(TreeNode *root)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">if</span> (!<span class="hljs-built_in">has_red_child</span>(root)) <span class="hljs-keyword">return</span> root; <span class="hljs-comment">// 如果没有红节点，不用调整</span><br>    <span class="hljs-comment">// 若有冲突此时分两种情况 1、左右子树都为红；2、一红一黑</span><br>    <span class="hljs-keyword">if</span> (root-&gt;left-&gt;color == <span class="hljs-number">0</span> &amp;&amp; root-&gt;right-&gt;color == <span class="hljs-number">0</span>)<br>    &#123;<br>        <span class="hljs-keyword">if</span> (<span class="hljs-built_in">has_red_child</span>(root-&gt;left) || <span class="hljs-built_in">has_red_child</span>(root-&gt;right))<br>        &#123;<br>            root-&gt;color = <span class="hljs-number">0</span>;<br>            root-&gt;left-&gt;color = root-&gt;right-&gt;color = <span class="hljs-number">1</span>;<br>            <span class="hljs-keyword">return</span> root;<br>        &#125;<br>    &#125;<br>    <span class="hljs-type">int</span> flag = <span class="hljs-number">0</span>; <span class="hljs-comment">//1:冲突发生在左子树；2：冲突发生在右子树</span><br>    <span class="hljs-keyword">if</span> (root-&gt;left-&gt;color == <span class="hljs-number">0</span> &amp;&amp; <span class="hljs-built_in">has_red_child</span>(root-&gt;left))   flag = <span class="hljs-number">1</span>;<br>    <span class="hljs-keyword">if</span> (root-&gt;right-&gt;color == <span class="hljs-number">0</span> &amp;&amp; <span class="hljs-built_in">has_red_child</span>(root-&gt;right)) flag = <span class="hljs-number">2</span>;<br>    <span class="hljs-keyword">if</span> (flag == <span class="hljs-number">0</span>) <span class="hljs-keyword">return</span> root;<br>    <span class="hljs-keyword">if</span> (flag == <span class="hljs-number">1</span>)<br>    &#123;<br>        <span class="hljs-keyword">if</span> (root-&gt;left-&gt;right-&gt;color == <span class="hljs-number">0</span>) root-&gt;left = <span class="hljs-built_in">left_rotate</span>(root-&gt;left);<br>        root = <span class="hljs-built_in">right_rotate</span>(root);<br>    &#125;<br>    <span class="hljs-keyword">else</span><br>    &#123;<br>        <span class="hljs-keyword">if</span> (root-&gt;right-&gt;left-&gt;color == <span class="hljs-number">0</span>) root-&gt;right = <span class="hljs-built_in">right_rotate</span>(root-&gt;right);<br>        root = <span class="hljs-built_in">left_rotate</span>(root);<br>    &#125;<br>    root-&gt;color = <span class="hljs-number">0</span>;<br>    root-&gt;left-&gt;color = root-&gt;right-&gt;color = <span class="hljs-number">1</span>;<br>    <span class="hljs-keyword">return</span> root;<br>&#125;<br><br><span class="hljs-comment">//插入</span><br>TreeNode *__insert(TreeNode *root, <span class="hljs-type">int</span> key)<br>&#123;<br>    <span class="hljs-keyword">if</span> (root == NIL) <span class="hljs-keyword">return</span> <span class="hljs-built_in">getNewNode</span>(key);<br>    <span class="hljs-keyword">if</span> (root-&gt;key == key) <span class="hljs-keyword">return</span> root;<br>    <span class="hljs-keyword">if</span> (key &gt; root-&gt;key) root-&gt;right = __insert(root-&gt;right, key);<br>    <span class="hljs-keyword">else</span> root-&gt;left = __insert(root-&gt;left, key);<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">insert_maintain</span>(root);<br>&#125;<br><br><span class="hljs-function">TreeNode *<span class="hljs-title">insert</span><span class="hljs-params">(TreeNode *root, <span class="hljs-type">int</span> key)</span></span><br><span class="hljs-function"></span>&#123;<br>    root = __insert(root, key);<br>    root-&gt;color = <span class="hljs-number">1</span>; <span class="hljs-comment">////强制将root的颜色改为黑色</span><br>    <span class="hljs-keyword">return</span> root;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">print</span><span class="hljs-params">(TreeNode *root)</span></span><br><span class="hljs-function"></span>&#123;<br>    cout  &lt;&lt; root-&gt;color &lt;&lt;  root-&gt;key &lt;&lt; root-&gt;left-&gt;key &lt;&lt; root-&gt;right-&gt;key &lt;&lt; endl;<br>    <span class="hljs-keyword">return</span>;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">output</span><span class="hljs-params">(TreeNode *root)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">if</span> (root == NIL) <span class="hljs-keyword">return</span>;<br>    <span class="hljs-built_in">print</span>(root);<br>    <span class="hljs-built_in">output</span>(root-&gt;left);<br>    <span class="hljs-built_in">output</span>(root-&gt;right);<br>    <span class="hljs-keyword">return</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E9%9A%8F%E7%AC%94/" class="category-chain-item">随笔</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/c/">#c++</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>红黑树：C++</div>
+      <div>https://tthres.github.io/2022/03/30/2022-03-29-c-红黑树的实现/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>水果挺甜</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年3月30日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/04/11/2022-4-11-%E5%9F%BA%E6%95%B0%E6%8E%92%E5%BA%8F/" title="基数排序">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">基数排序</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'tthres/tthres.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

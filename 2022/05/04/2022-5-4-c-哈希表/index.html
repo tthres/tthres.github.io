@@ -1,0 +1,711 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar.png">
+  <link rel="icon" href="/img/avatar.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="水果挺甜">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="哈希表（Hash Table）是根据关键码的值直接访问数据的数据结构，我们经常用的数组就是一张哈希表，哈希表中的关键码就是数组的索引下标，通过下标直接访问数组中的元素。哈希表一般用来快速判断一个元素是否出现在集合中，查询效率和增删效率都是O(1)。通过哈希函数能实现Key和Value的映射。当实现哈希碰撞时，可以采用拉链法和线性探测法，这里用拉链发解决哈希碰撞，实现unordered_map。ha">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++哈希表">
+<meta property="og:url" content="https://tthres.github.io/2022/05/04/2022-5-4-c-%E5%93%88%E5%B8%8C%E8%A1%A8/index.html">
+<meta property="og:site_name" content="水果挺甜&#39;blog">
+<meta property="og:description" content="哈希表（Hash Table）是根据关键码的值直接访问数据的数据结构，我们经常用的数组就是一张哈希表，哈希表中的关键码就是数组的索引下标，通过下标直接访问数组中的元素。哈希表一般用来快速判断一个元素是否出现在集合中，查询效率和增删效率都是O(1)。通过哈希函数能实现Key和Value的映射。当实现哈希碰撞时，可以采用拉链法和线性探测法，这里用拉链发解决哈希碰撞，实现unordered_map。ha">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-05-04T10:21:10.000Z">
+<meta property="article:modified_time" content="2023-03-08T09:33:30.341Z">
+<meta property="article:author" content="水果挺甜">
+<meta property="article:tag" content="c++">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>C++哈希表 - 水果挺甜&#39;blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"tthres.github.io","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>水果挺甜&#39;blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="C++哈希表"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-05-04 18:21" pubdate>
+          2022年5月4日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          7.5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          63 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">C++哈希表</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h4 id="哈希表（Hash-Table）是根据关键码的值直接访问数据的数据结构，我们经常用的数组就是一张哈希表，哈希表中的关键码就是数组的索引下标，通过下标直接访问数组中的元素。"><a href="#哈希表（Hash-Table）是根据关键码的值直接访问数据的数据结构，我们经常用的数组就是一张哈希表，哈希表中的关键码就是数组的索引下标，通过下标直接访问数组中的元素。" class="headerlink" title="哈希表（Hash Table）是根据关键码的值直接访问数据的数据结构，我们经常用的数组就是一张哈希表，哈希表中的关键码就是数组的索引下标，通过下标直接访问数组中的元素。"></a>哈希表（Hash Table）是根据关键码的值直接访问数据的数据结构，我们经常用的数组就是一张哈希表，哈希表中的关键码就是数组的索引下标，通过下标直接访问数组中的元素。<br></h4><h4 id="哈希表一般用来快速判断一个元素是否出现在集合中，查询效率和增删效率都是O-1-。通过哈希函数能实现Key和Value的映射。当实现哈希碰撞时，可以采用拉链法和线性探测法，这里用拉链发解决哈希碰撞，实现unordered-map。"><a href="#哈希表一般用来快速判断一个元素是否出现在集合中，查询效率和增删效率都是O-1-。通过哈希函数能实现Key和Value的映射。当实现哈希碰撞时，可以采用拉链法和线性探测法，这里用拉链发解决哈希碰撞，实现unordered-map。" class="headerlink" title="哈希表一般用来快速判断一个元素是否出现在集合中，查询效率和增删效率都是O(1)。通过哈希函数能实现Key和Value的映射。当实现哈希碰撞时，可以采用拉链法和线性探测法，这里用拉链发解决哈希碰撞，实现unordered_map。"></a>哈希表一般用来快速判断一个元素是否出现在集合中，查询效率和增删效率都是O(1)。通过哈希函数能实现Key和Value的映射。当实现哈希碰撞时，可以采用拉链法和线性探测法，这里用拉链发解决哈希碰撞，实现unordered_map。</h4><h2 id="hashtable的使用"><a href="#hashtable的使用" class="headerlink" title="hashtable的使用"></a>hashtable的使用</h2><p>这里用unordered_map来举例</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>&#123;<br>    unordered_map&lt;<span class="hljs-type">int</span>, string&gt; map;<br>    map.<span class="hljs-built_in">insert</span>(<span class="hljs-built_in">pair</span>&lt;<span class="hljs-type">int</span>, string&gt;(<span class="hljs-number">1</span>, <span class="hljs-string">&quot;3423&quot;</span>));<br>    cout &lt;&lt; map[<span class="hljs-number">1</span>] &lt;&lt;endl; <span class="hljs-comment">// 输出3423</span><br>&#125;<br></code></pre></td></tr></table></figure>
+<p>可以看到需要unordered_map定义数据结构存储key和value。由于使用拉链法处理哈希碰撞，应该定义一个Node节点用来存key和value，同时在Node节点中存储指向下一个节点的next指针。<br></p>
+<h2 id="hashtable的Node节点实现"><a href="#hashtable的Node节点实现" class="headerlink" title="hashtable的Node节点实现"></a>hashtable的Node节点实现</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Node</span> &#123;<br><span class="hljs-keyword">public</span> :<br>    <span class="hljs-built_in">Node</span>() = <span class="hljs-keyword">default</span>;<br>    <span class="hljs-built_in">Node</span> (string, <span class="hljs-type">int</span>, Node *);<br>    <span class="hljs-function">string <span class="hljs-title">key</span><span class="hljs-params">()</span></span>;               <span class="hljs-comment">// 返回键</span><br>    <span class="hljs-type">int</span> value;                  <span class="hljs-comment">// 值</span><br>    <span class="hljs-function">Node* <span class="hljs-title">next</span><span class="hljs-params">()</span></span>;               <span class="hljs-comment">// 返回当前节点的下一节点</span><br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">set_next</span><span class="hljs-params">(Node *)</span></span>;      <span class="hljs-comment">// 设置当前节点的下一节点</span><br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">insert</span><span class="hljs-params">(Node *)</span></span>;        <span class="hljs-comment">// 传入一个节点并插入到当前节点后</span><br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">erase_next</span><span class="hljs-params">()</span></span>;          <span class="hljs-comment">// 删除当前节点的下一节点</span><br><br><span class="hljs-keyword">private</span>:<br>    string __key;<br>    Node *__next;<br>&#125;;<br></code></pre></td></tr></table></figure>
+<p>实现：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c++">Node::<span class="hljs-built_in">Node</span> (string key, <span class="hljs-type">int</span> value, Node *next = <span class="hljs-literal">nullptr</span>) <br>: __key(key), <span class="hljs-built_in">value</span>(value), __next(next) &#123;&#125;<br><br><span class="hljs-function">string <span class="hljs-title">Node::key</span><span class="hljs-params">()</span> </span>&#123; <span class="hljs-keyword">return</span> __key; &#125;<br><span class="hljs-function">Node* <span class="hljs-title">Node::next</span><span class="hljs-params">()</span> </span>&#123; <span class="hljs-keyword">return</span> __next; &#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">// 设置当前节点下一个节点的地址</span><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">Node::set_next</span><span class="hljs-params">(Node *next)</span> </span>&#123;<br>    __next = next;<br>    <span class="hljs-keyword">return</span> ;<br>&#125;<br><br><span class="hljs-comment">// 传入一个节点并插入到当前节点的后面</span><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">Node::insert</span><span class="hljs-params">(Node *node)</span> </span>&#123;<br>    node-&gt;<span class="hljs-built_in">set_next</span>(<span class="hljs-keyword">this</span>-&gt;<span class="hljs-built_in">next</span>()); <span class="hljs-comment">// 把当前节点的next设置给传入节点的next</span><br>    <span class="hljs-keyword">this</span>-&gt;<span class="hljs-built_in">set_next</span>(node);         <span class="hljs-comment">// 让当前节点指向node节点</span><br>&#125;<br><br><span class="hljs-comment">// 删除下一节点</span><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">Node::erase_next</span><span class="hljs-params">()</span> </span>&#123;<br>    Node *p = <span class="hljs-keyword">this</span>-&gt;<span class="hljs-built_in">next</span>();<br>    <span class="hljs-keyword">if</span> (p == <span class="hljs-literal">nullptr</span>) <span class="hljs-keyword">return</span> ;<br>    <span class="hljs-keyword">this</span>-&gt;<span class="hljs-built_in">set_next</span>(<span class="hljs-keyword">this</span>-&gt;<span class="hljs-built_in">next</span>()-&gt;<span class="hljs-built_in">next</span>());<br>    <span class="hljs-keyword">delete</span> p;<br>&#125;<br></code></pre></td></tr></table></figure>
+<br>
+
+<h2 id="hashtable的实现"><a href="#hashtable的实现" class="headerlink" title="hashtable的实现"></a>hashtable的实现</h2><p>定义一个数组用来存储Node节点，同时声明数组的大小__size,存储元素的数量data_cnt。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">class</span> <span class="hljs-title class_">HashTable</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-comment">// 哈希函数，传入string通过哈希函数返回数组上的索引</span><br>    <span class="hljs-keyword">using</span> HASH_FUNC_T = function&lt;<span class="hljs-built_in">int</span>(string)&gt;;<br>    <span class="hljs-built_in">HashTable</span>(HASH_FUNC_T hash_func, <span class="hljs-type">int</span> size);<br>    <span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">insert</span><span class="hljs-params">(string, <span class="hljs-type">int</span>)</span></span>;             <span class="hljs-comment">// 插入一个键值对</span><br>    <span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">earse</span><span class="hljs-params">(string)</span></span>;                   <span class="hljs-comment">// 删除一个键值对</span><br>    <span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">find</span><span class="hljs-params">(string)</span></span>;                    <span class="hljs-comment">// 查找元素</span><br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">capacity</span><span class="hljs-params">()</span></span>;                       <span class="hljs-comment">// 返回存储元素数量</span><br>    <span class="hljs-type">int</span> &amp;<span class="hljs-keyword">operator</span>[](string);              <span class="hljs-comment">// 重载[]使其能直接通过map[key]访问值</span><br>    <span class="hljs-type">void</span> __swap(HashTable &amp;);             <span class="hljs-comment">// 自定义交换函数，用于扩容</span><br><br>    ~<span class="hljs-built_in">HashTable</span>();<br><br><span class="hljs-keyword">private</span>:<br>    Node *__insert(string, <span class="hljs-type">int</span>);<br>    Node *__find(string);<br>    <span class="hljs-type">void</span> __expand();                      <span class="hljs-comment">// 扩容</span><br>    <span class="hljs-type">int</span> __size, data_cnt;<br>    vector&lt;Node&gt; data;<br>    HASH_FUNC_T hash_func;<br>&#125;;<br></code></pre></td></tr></table></figure>
+<p>实现：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs c++">HashTable::<span class="hljs-built_in">HashTable</span>(HASH_FUNC_T hash_func, <span class="hljs-type">int</span> size = <span class="hljs-number">10</span>) <br>: <span class="hljs-built_in">hash_func</span>(hash_func), <span class="hljs-built_in">data</span>(size), __size(size), <span class="hljs-built_in">data_cnt</span>(<span class="hljs-number">0</span>) &#123;&#125;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">HashTable::capacity</span><span class="hljs-params">()</span> </span>&#123; <span class="hljs-keyword">return</span> data_cnt; &#125;<br><br><span class="hljs-comment">// 扩容，参考STL的扩容操作</span><br><span class="hljs-type">void</span> HashTable::__expand() &#123;<br>    <span class="hljs-function">HashTable <span class="hljs-title">h</span><span class="hljs-params">(hash_func, <span class="hljs-number">2</span> * __size)</span></span>;   <span class="hljs-comment">// 开辟两倍的空间</span><br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; __size; i++) &#123;    <span class="hljs-comment">// 将原来的所有元素放到新开辟的hashtable中</span><br>        Node *p = data[i].<span class="hljs-built_in">next</span>();<br>        <span class="hljs-keyword">while</span> (p) &#123;<br>            h.<span class="hljs-built_in">insert</span>(p-&gt;<span class="hljs-built_in">key</span>(), p-&gt;value); <span class="hljs-comment">// 将每条链上的节点也放进去</span><br>            p = p-&gt;<span class="hljs-built_in">next</span>();<br>        &#125;<br>    &#125;<br>    <span class="hljs-keyword">this</span>-&gt;__swap(h);  <span class="hljs-comment">// 交换所有数据</span><br>    <span class="hljs-keyword">return</span> ;<br>&#125;<br><br><span class="hljs-type">void</span> HashTable::__swap(HashTable &amp;h) &#123;<br>    <span class="hljs-built_in">swap</span>(__size, h.__size);<br>    <span class="hljs-built_in">swap</span>(data_cnt, h.data_cnt);<br>    <span class="hljs-built_in">swap</span>(data, h.data);<br>    <span class="hljs-built_in">swap</span>(hash_func, h.hash_func);<br>    <span class="hljs-keyword">return</span> ;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>插入节点：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">HashTable::insert</span><span class="hljs-params">(string key, <span class="hljs-type">int</span> value = <span class="hljs-number">0</span>)</span> </span>&#123;<br>    Node *p = __insert(key, value);<br>    <span class="hljs-keyword">if</span> (data_cnt &gt; __size * <span class="hljs-number">2</span>) __expand();    <span class="hljs-comment">// 扩容</span><br>    <span class="hljs-keyword">return</span> p != <span class="hljs-literal">nullptr</span>;<br>&#125;<br><br>Node *HashTable::__insert(string key, <span class="hljs-type">int</span> value) &#123;<br>    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">find</span>(key)) <span class="hljs-keyword">return</span> <span class="hljs-literal">nullptr</span>;            <span class="hljs-comment">// 如果键已经存在，没必要插入</span><br>    <span class="hljs-type">int</span> ind = <span class="hljs-built_in">hash_func</span>(key) % data.<span class="hljs-built_in">size</span>();   <span class="hljs-comment">// 当前key值在数组中存储的位置</span><br>    Node *p;<br>    data[ind].<span class="hljs-built_in">insert</span>((p = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Node</span>(key, value)));<br>    data_cnt += <span class="hljs-number">1</span>;                            <span class="hljs-comment">// 存储数量增加</span><br>    <span class="hljs-keyword">return</span> p;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>查找元素：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">HashTable::find</span><span class="hljs-params">(string key)</span> </span>&#123;<br>    <span class="hljs-keyword">return</span> __find(key) != <span class="hljs-literal">nullptr</span>;<br>&#125;<br><br>Node *HashTable::__find(string key) &#123;<br>    <span class="hljs-type">int</span> ind = <span class="hljs-built_in">hash_func</span>(key) % __size;         <span class="hljs-comment">// 计算出在数组中的位置</span><br>    Node *p = data[ind].<span class="hljs-built_in">next</span>();                <span class="hljs-comment">// 遍历链表中的每个节点</span><br>    <span class="hljs-keyword">while</span> (p &amp;&amp; p-&gt;<span class="hljs-built_in">key</span>() != key) p = p-&gt;<span class="hljs-built_in">next</span>();<br>    <span class="hljs-keyword">return</span> p;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>删除节点：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">HashTable::earse</span><span class="hljs-params">(string key)</span> </span>&#123;<br>    <span class="hljs-type">int</span> ind = <span class="hljs-built_in">hash_func</span>(key) % __size;<br>    Node *p = &amp;data[ind];<br>    <span class="hljs-keyword">while</span> (p-&gt;<span class="hljs-built_in">next</span>() &amp;&amp; p-&gt;<span class="hljs-built_in">next</span>()-&gt;<span class="hljs-built_in">key</span>() != key) p = p-&gt;<span class="hljs-built_in">next</span>();<br>    <span class="hljs-keyword">if</span> (p-&gt;<span class="hljs-built_in">next</span>() == <span class="hljs-literal">nullptr</span>) <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>    p-&gt;<span class="hljs-built_in">erase_next</span>();<br>    data_cnt -= <span class="hljs-number">1</span>;   <br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>重载[]：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-type">int</span> &amp;HashTable::<span class="hljs-keyword">operator</span>[](string key) &#123;<br>    Node *p = __find(key);<br>    <span class="hljs-keyword">if</span> (p) <span class="hljs-keyword">return</span> p-&gt;value;                   <span class="hljs-comment">// 如果没找到就新插入一个节点</span><br>    <span class="hljs-built_in">insert</span>(key, <span class="hljs-number">0</span>);<br>    <span class="hljs-keyword">return</span> __find(key)-&gt;value;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>析构：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c++">HashTable::~<span class="hljs-built_in">HashTable</span>() &#123;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; __size; i++) &#123;<br>        <span class="hljs-keyword">while</span> (data[i].<span class="hljs-built_in">next</span>()) data[i].<span class="hljs-built_in">erase_next</span>(); <span class="hljs-comment">// 删除拉链上的所有节点</span><br>    &#125;<br>    <span class="hljs-keyword">return</span> ;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h4 id="至此实现完了一个key为string，value为int类型的hashtable，包含insert、find等方法。使用如下："><a href="#至此实现完了一个key为string，value为int类型的hashtable，包含insert、find等方法。使用如下：" class="headerlink" title="至此实现完了一个key为string，value为int类型的hashtable，包含insert、find等方法。使用如下："></a>至此实现完了一个key为string，value为int类型的hashtable，包含insert、find等方法。使用如下：</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">// 先定义一个哈希函数</span><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">FUNCC</span><span class="hljs-params">(string key)</span> </span>&#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">atoi</span>(key.<span class="hljs-built_in">c_str</span>()) % <span class="hljs-number">7</span>;<br>&#125;<br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;   <br>    <span class="hljs-function">HashTable <span class="hljs-title">h1</span><span class="hljs-params">(FUNCC)</span></span>;<br>    cout &lt;&lt; h1.<span class="hljs-built_in">capacity</span>() &lt;&lt; endl;<br>    h1[<span class="hljs-string">&quot;hello&quot;</span>] = <span class="hljs-number">123</span>;<br>    h1[<span class="hljs-string">&quot;world&quot;</span>] = <span class="hljs-number">456</span>;<br>    cout &lt;&lt; h1.<span class="hljs-built_in">capacity</span>() &lt;&lt; endl;<br>    cout &lt;&lt; h1[<span class="hljs-string">&quot;hello&quot;</span>] &lt;&lt; <span class="hljs-string">&quot; &quot;</span> &lt;&lt; h1[<span class="hljs-string">&quot;world&quot;</span>] &lt;&lt; endl;<br>    h1.<span class="hljs-built_in">insert</span>(<span class="hljs-string">&quot;aaa&quot;</span>, <span class="hljs-number">1</span>);<br>    cout &lt;&lt; h1[<span class="hljs-string">&quot;aaa&quot;</span>] &lt;&lt; endl;<br>    cout &lt;&lt; h1[<span class="hljs-string">&quot;ccc&quot;</span>] &lt;&lt; endl;<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>    <span class="hljs-comment">/*</span><br><span class="hljs-comment">      输出：</span><br><span class="hljs-comment">      0</span><br><span class="hljs-comment">      2</span><br><span class="hljs-comment">      123 456</span><br><span class="hljs-comment">      1</span><br><span class="hljs-comment">      0</span><br><span class="hljs-comment">    */</span><br>&#125;<br></code></pre></td></tr></table></figure>
+<br>
+## 加入模板
+完整代码如下：
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;vector&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;string&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;functional&gt;</span></span><br> <br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">FUNCC</span><span class="hljs-params">(string key)</span> </span>&#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">atoi</span>(key.<span class="hljs-built_in">c_str</span>()) % <span class="hljs-number">7</span>;<br>&#125;<br><br><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> KEY, <span class="hljs-keyword">typename</span> VALUE&gt;<br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Node</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-built_in">Node</span>() = <span class="hljs-keyword">default</span>;<br>    VALUE value;<br><br>    <span class="hljs-built_in">Node</span> (KEY key, VALUE value, Node&lt;KEY, VALUE&gt; *next = <span class="hljs-literal">nullptr</span>)<br>    : __key(key), <span class="hljs-built_in">value</span>(value), __next(next) &#123;&#125;<br><br>    <span class="hljs-function">KEY <span class="hljs-title">key</span><span class="hljs-params">()</span> </span>&#123; <span class="hljs-keyword">return</span> __key; &#125;               <br>    <br>    <span class="hljs-function">Node&lt;KEY, VALUE&gt;* <span class="hljs-title">next</span><span class="hljs-params">()</span> </span>&#123; <span class="hljs-keyword">return</span> __next; &#125;<br><br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">set_next</span><span class="hljs-params">(Node&lt;KEY, VALUE&gt; *next)</span> </span>&#123;  <br>        __next = next;<br>    &#125;<br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">insert</span><span class="hljs-params">(Node&lt;KEY, VALUE&gt; *node)</span> </span>&#123;  <br>        node-&gt;<span class="hljs-built_in">set_next</span>(<span class="hljs-keyword">this</span>-&gt;<span class="hljs-built_in">next</span>());<br>        <span class="hljs-keyword">this</span>-&gt;<span class="hljs-built_in">set_next</span>(node);<br>    &#125;<br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">erase_next</span><span class="hljs-params">()</span> </span>&#123; <br>        Node&lt;KEY, VALUE&gt; *p = <span class="hljs-keyword">this</span>-&gt;<span class="hljs-built_in">next</span>();<br>        <span class="hljs-keyword">if</span> (p == <span class="hljs-literal">nullptr</span>) <span class="hljs-keyword">return</span> ;<br>        <span class="hljs-keyword">this</span>-&gt;<span class="hljs-built_in">set_next</span>(<span class="hljs-keyword">this</span>-&gt;<span class="hljs-built_in">next</span>()-&gt;<span class="hljs-built_in">next</span>());<br>        <span class="hljs-keyword">delete</span> p;<br>    &#125;<br><br><span class="hljs-keyword">private</span>:<br>    KEY __key;<br>    Node&lt;KEY, VALUE&gt; *__next;<br>&#125;;<br><span class="hljs-comment">/////////////////////</span><br><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> KEY, <span class="hljs-keyword">typename</span> VALUE&gt;<br><span class="hljs-keyword">class</span> <span class="hljs-title class_">HashTable</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-keyword">using</span> HASH_FUNC_T = function&lt;<span class="hljs-built_in">int</span>(string)&gt;;<br>    <span class="hljs-built_in">HashTable</span>(HASH_FUNC_T hash_func, <span class="hljs-type">int</span> size = <span class="hljs-number">10</span>)<br>    : <span class="hljs-built_in">hash_func</span>(hash_func), <span class="hljs-built_in">data</span>(size), __size(size), <span class="hljs-built_in">data_cnt</span>(<span class="hljs-number">0</span>) &#123;<br><br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">insert</span><span class="hljs-params">(KEY key, VALUE value = VALUE())</span> </span>&#123;  <br>        Node&lt;KEY, VALUE&gt; *p = __insert(key, value);<br>        <span class="hljs-keyword">if</span> (data_cnt &gt; __size * <span class="hljs-number">2</span>) __expand();<br>        <span class="hljs-keyword">return</span> p != <span class="hljs-literal">nullptr</span>;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">earse</span><span class="hljs-params">(KEY key)</span> </span>&#123;<br>        <span class="hljs-type">int</span> ind = <span class="hljs-built_in">hash_func</span>(key) % data.<span class="hljs-built_in">size</span>();<br>        Node&lt;KEY, VALUE&gt; *p = &amp;data[ind];<br>        <span class="hljs-keyword">while</span> (p-&gt;<span class="hljs-built_in">next</span>() &amp;&amp; p-&gt;<span class="hljs-built_in">next</span>()-&gt;<span class="hljs-built_in">key</span>() != key) p = p-&gt;<span class="hljs-built_in">next</span>();<br>        <span class="hljs-comment">// 找没找到</span><br>        <span class="hljs-keyword">if</span> (p-&gt;<span class="hljs-built_in">next</span>() == <span class="hljs-literal">nullptr</span>) <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>        p-&gt;<span class="hljs-built_in">erase_next</span>();<br>        data_cnt -= <span class="hljs-number">1</span>;<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">find</span><span class="hljs-params">(KEY key)</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> __find(key) != <span class="hljs-literal">nullptr</span>;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">capacity</span><span class="hljs-params">()</span> </span>&#123; <span class="hljs-keyword">return</span> data_cnt; &#125;<br><br>    VALUE &amp;<span class="hljs-keyword">operator</span>[](KEY key) &#123; <br>        Node&lt;KEY, VALUE&gt; *p = __find(key);<br>        <span class="hljs-keyword">if</span> (p) <span class="hljs-keyword">return</span> p-&gt;value;<br>        <span class="hljs-built_in">insert</span>(key, <span class="hljs-built_in">VALUE</span>());<br>        <span class="hljs-keyword">return</span> __find(key)-&gt;value;<br>    &#125;<br><br>    <span class="hljs-type">void</span> __swap(HashTable&lt;KEY, VALUE&gt; &amp;h) &#123;<br>        <span class="hljs-built_in">swap</span>(__size, h.__size);<br>        <span class="hljs-built_in">swap</span>(data_cnt, h.data_cnt);<br>        <span class="hljs-built_in">swap</span>(data, h.data);<br>        <span class="hljs-built_in">swap</span>(hash_func, h.hash_func);<br>    &#125;<br><br>    ~<span class="hljs-built_in">HashTable</span>() &#123;<br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; __size; i++) &#123;<br>            <span class="hljs-keyword">while</span> (data[i].<span class="hljs-built_in">next</span>()) data[i].<span class="hljs-built_in">erase_next</span>(); <br>        &#125;<br>    &#125;<br><br><span class="hljs-keyword">private</span>:<br>    Node&lt;KEY, VALUE&gt; *__insert(KEY key, VALUE value) &#123;<br>        <span class="hljs-keyword">if</span> (<span class="hljs-built_in">find</span>(key)) <span class="hljs-keyword">return</span> <span class="hljs-literal">nullptr</span>; <br>        <span class="hljs-type">int</span> ind = <span class="hljs-built_in">hash_func</span>(key) % data.<span class="hljs-built_in">size</span>(); <br>        Node&lt;KEY, VALUE&gt; *p;<br>        data[ind].<span class="hljs-built_in">insert</span>((p = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Node</span>&lt;KEY, VALUE&gt;(key, value))); <br>        data_cnt += <span class="hljs-number">1</span>;<br>        <span class="hljs-keyword">return</span> p;<br>    &#125;<br><br>    Node&lt;KEY, VALUE&gt; *__find(KEY key) &#123;<br>        <span class="hljs-type">int</span> ind = <span class="hljs-built_in">hash_func</span>(key) % data.<span class="hljs-built_in">size</span>();<br>        Node&lt;KEY, VALUE&gt; *p = data[ind].<span class="hljs-built_in">next</span>();<br>        <span class="hljs-keyword">while</span> (p &amp;&amp; p-&gt;<span class="hljs-built_in">key</span>() != key) p = p-&gt;<span class="hljs-built_in">next</span>();<br>        <span class="hljs-keyword">return</span> p;<br>    &#125;<br><br>    <span class="hljs-type">void</span> __expand() &#123;<br>        <span class="hljs-function">HashTable&lt;KEY, VALUE&gt; <span class="hljs-title">h</span><span class="hljs-params">(hash_func, <span class="hljs-number">2</span> * __size)</span></span>;<br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; __size; i++) &#123;<br>            Node&lt;KEY, VALUE&gt; *p = data[i].<span class="hljs-built_in">next</span>();<br>            <span class="hljs-keyword">while</span> (p) &#123;<br>                h.<span class="hljs-built_in">insert</span>(p-&gt;<span class="hljs-built_in">key</span>(), p-&gt;value);<br>                p = p-&gt;<span class="hljs-built_in">next</span>();<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">this</span>-&gt;__swap(h);<br>        <span class="hljs-keyword">return</span> ;<br>    &#125;<br><br><br>    <span class="hljs-type">int</span> __size, data_cnt;<br>    vector&lt;Node&lt;KEY, VALUE&gt;&gt; data;<br>    HASH_FUNC_T hash_func;<br>&#125;;<br></code></pre></td></tr></table></figure>
+用模板实现后初始化哈希表时就能用
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function">HashTable&lt;string, <span class="hljs-type">int</span>&gt; <span class="hljs-title">h1</span><span class="hljs-params">(FUNCC)</span></span>;<br></code></pre></td></tr></table></figure>
+FUNCC表示自定义哈希函数。
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E9%9A%8F%E7%AC%94/" class="category-chain-item">随笔</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/c/">#c++</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>C++哈希表</div>
+      <div>https://tthres.github.io/2022/05/04/2022-5-4-c-哈希表/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>水果挺甜</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年5月4日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/05/06/2022-5-6-c-function/" title="std::function">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">std::function</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/05/01/2022-5-1-c-std-sort/" title="std::sort">
+                        <span class="hidden-mobile">std::sort</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'tthres/tthres.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
